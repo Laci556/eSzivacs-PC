@@ -348,6 +348,36 @@ function renderHianyzasok(){
                 cardContainer.classList.add("col");
                 cardContainer.classList.add("s12");
                 cardContainer.classList.add("m4");
+                
+                var divLink = document.createElement("a");
+                divLink.classList.add("modal-trigger");
+                divLink.href = `#Absences-${element['AbsenceId']}`;
+
+                /*
+                <!-- Modal Structure -->
+                <div id="modal1" class="modal">
+                    <div class="modal-content">
+                    <h4>Modal Header</h4>
+                    <p>A bunch of text</p>
+                    </div>
+                    <div class="modal-footer">
+                    <a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+                    </div>
+                </div>
+                */
+               var modal = document.createElement("div");
+               modal.classList.add("modal");
+               modal.id = `Absences-${element['AbsenceId']}`;
+
+               var modalContent = document.createElement("div");
+               modalContent.classList.add("modal-content");
+               modalContent.innerHTML = `<h4>${element['Date'].split("T")[0].split("-")[0]}. ${element['Date'].split("T")[0].split("-")[1]}. ${element['Date'].split("T")[0].split("-")[2]}</h4><br>Igazolt-e? - ${element['Justification']}`;
+
+               modal.appendChild(modalContent);
+               document.getElementById("hianyzasok").appendChild(modal);
+
+               var elems = document.querySelectorAll(`#Absences-${element['AbsenceId']}`);
+               var instances = M.Modal.init(elems, {});
 
                 var card = document.createElement("div");
                 card.classList.add("card");
@@ -370,7 +400,8 @@ function renderHianyzasok(){
 
                 cardContent.appendChild(cardTitle);
                 card.appendChild(cardContent);
-                cardContainer.appendChild(card);
+                divLink.appendChild(card);
+                cardContainer.appendChild(divLink);
                 document.getElementById("hianyzasok").appendChild(cardContainer);
             });
             isHianyzasokLoadedOnce = true;
