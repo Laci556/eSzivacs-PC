@@ -10,6 +10,8 @@ var loginDatas;
 var userDatas;
 var isFooldalLoadedOnce = false;
 var isJegyeimLoadedOnce = false;
+var isHianyzasokLoadedOnce = false;
+var hianyzasok = [];
 
 function updateSchools(){
     return new Promise(function(resolve, reject) {
@@ -51,6 +53,8 @@ function showPage(page, hideEveryThing){
         renderFooldal();
     } else if(page == "jegyek"){
         renderJegyeim();
+    } else if(page == "hianyzasok"){
+        renderHianyzasok();
     }
 }
 
@@ -84,7 +88,7 @@ function jegyek(){
     showPage("jegyek", true);
 }
 
-function hianyzasok(){
+function hianyzasok2(){
     showPage("hianyzasok", true);
 }
 
@@ -115,7 +119,7 @@ function showNavbar(toShow){
         }
         for(var i = 0; i < hianyzasokButtons.length; i++) {
             (function(index) {
-                hianyzasokButtons[index].addEventListener("click", hianyzasok);
+                hianyzasokButtons[index].addEventListener("click", hianyzasok2);
             })(i);
         }
         for(var i = 0; i < logoutButtons.length; i++) {
@@ -308,6 +312,62 @@ function renderJegyeim(){
                 }
             });
             isJegyeimLoadedOnce = true;
+        }
+    });
+}
+
+function renderHianyzasok(){
+    loadUserDatas().then(function(result){
+        if(!isHianyzasokLoadedOnce){
+            // Put every unique element to hianyzasok array
+            result['Absences'].forEach(function(element){
+                var isHianyzasokContainsDay = false;
+                hianyzasok.forEach(function(element2){
+                    if(element['LessonStartTime'] == element2['Date']){
+                        isHianyzasokContainsDay = true;
+                    }
+                });
+                if(!isHianyzasokContainsDay){
+                    var day = {
+                        "Date": element['LessonStartTime'],
+                        "Justification": element['JustificationState']
+                    };
+                    hianyzasok.push(day);
+                }
+            });
+
+            // Loop throught hianyzasok to display them
+            hianyzasok.forEach(function(element){
+                var cardContainer = document.createElement("div");
+                cardContainer.classList.add("col");
+                cardContainer.classList.add("s12");
+                cardContainer.classList.add("m4");
+
+                var card = document.createElement("div");
+                card.classList.add("card");
+                card.classList.add("white-text");
+                if(element['Justification'] == "Justified"){
+                    card.classList.add("green");
+                } else if(element['Justification'] == "BeJustified"){
+                    card.classList.add("yellow");
+                } else {
+                    card.classList.add("red");
+                }
+                card.classList.add("darken-2");
+
+                var cardContent = document.createElement("div");
+                cardContent.classList.add("card-content");
+
+                var cardTitle = document.createElement("div");
+                cardTitle.classList.add("card-title");
+                cardTitle.innerHTML = `${element['Date'].split("T")[0].split("-")[0]}. ${element['Date'].split("T")[0].split("-")[1]}. ${element['Date'].split("T")[0].split("-")[2]}`
+
+                cardContent.appendChild(cardTitle);
+                card.appendChild(cardContent);
+                cardContainer.appendChild(card);
+                document.getElementById("hianyzasok").appendChild(cardContainer);
+            });
+            isHianyzasokLoadedOnce = true;
         }
     });
 }
