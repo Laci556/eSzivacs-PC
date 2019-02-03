@@ -107,6 +107,11 @@ function showNavbar(toShow){
         var hianyzasokButtons = document.getElementsByClassName('hianyzasok');
         var updateMyDatasButtons = document.getElementsByClassName('updateMyDatas');
 
+        loadUserDatas().then(function(result){
+            document.getElementById("name").innerHTML = result["Name"];
+            document.getElementById("school").innerHTML = result["InstituteName"]
+        });
+
         for(var i = 0; i < fooldalButtons.length; i++) {
             (function(index) {
                 fooldalButtons[index].addEventListener("click", fooldal);
@@ -213,6 +218,7 @@ function loadUserDatas(){
             fs.readFile('./user.json', 'utf8', function (err, data) {
                 if (err) reject(err);
                 user = JSON.parse(data);
+                userDatas = user;
                 resolve(user);
             });
         } else {
