@@ -1,0 +1,26 @@
+{
+  "name": "garden",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Gál Péter (pepyta)",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^4.0.2"
+  },
+  "dependencies": {
+    "async": "^2.6.1",
+    "ejs": "^2.6.1",
+    "ejs-electron": "^2.0.3",
+    "fs": "0.0.1-security",
+    "http": "0.0.0",
+    "materialize-css": "^1.0.0",
+    "path": "^0.12.7",
+    "request": "^2.88.0",
+    "url": "^0.11.0",
+    "wait.for-es6": "^0.1.0"
+  }
+}
