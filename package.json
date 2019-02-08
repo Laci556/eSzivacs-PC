@@ -1,6 +1,6 @@
 {
-  "name": "garden",
-  "version": "1.0.0",
+  "name": "eszivacs-pc",
+  "version": "0.0.1",
   "description": "",
   "main": "main.js",
   "scripts": {
@@ -20,7 +20,6 @@
     "materialize-css": "^1.0.0",
     "path": "^0.12.7",
     "request": "^2.88.0",
-    "url": "^0.11.0",
-    "wait.for-es6": "^0.1.0"
+    "url": "^0.11.0"
   }
 }

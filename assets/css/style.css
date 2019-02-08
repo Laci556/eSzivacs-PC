@@ -1,3 +1,19 @@
 .page{
     display: none;
 }
+
+.tabs{
+    background-color: black !important;
+}
+
+.tabs .tab a,
+.tabs .tab a:hover{
+    color: white !important;
+}
+
+.tabs .tab a:focus, .tabs .tab a:focus.active{
+    background-color: transparent;
+}
+.tabs .indicator {
+    background-color: white !important;
+}

@@ -12,6 +12,11 @@ var isFooldalLoadedOnce = false;
 var isJegyeimLoadedOnce = false;
 var isHianyzasokLoadedOnce = false;
 var hianyzasok = [];
+var jegyek = {
+    "MidYear": [],
+    "HalfYear": [],
+    "EndYear": []
+};
 
 function updateSchools(){
     return new Promise(function(resolve, reject) {
@@ -52,9 +57,9 @@ function showPage(page, hideEveryThing){
     if(page == "fooldal"){
         renderFooldal();
     } else if(page == "jegyek"){
-        renderJegyeim();
+        renderGrades();
     } else if(page == "hianyzasok"){
-        renderHianyzasok();
+        renderAbsences();
     }
 }
 
@@ -68,7 +73,7 @@ function logout(){
 function updateMyDatas(){
     kreta.getUserDatas(loginDatas["access_token"], loginDatas["InstituteCode"], null, null).then(function(result){
         saveUserDatas(result, fooldal);
-        M.toast({html: 'Sikeresen frissítetted az adataidat!!'});
+        M.toast({html: 'Sikeresen frissítetted az adataidat!'});
 
     }, function(){
         kreta.refreshToken(loginDatas['refresh_token'], loginDatas['InstituteCode']).then(function(result){
@@ -84,11 +89,11 @@ function fooldal(){
     showPage("fooldal", true);
 }
 
-function jegyek(){
+function jegyekFunc(){
     showPage("jegyek", true);
 }
 
-function hianyzasok2(){
+function hianyzasokFunc(){
     showPage("hianyzasok", true);
 }
 
@@ -119,12 +124,12 @@ function showNavbar(toShow){
         }
         for(var i = 0; i < jegyekButtons.length; i++) {
             (function(index) {
-                jegyekButtons[index].addEventListener("click", jegyek);
+                jegyekButtons[index].addEventListener("click", jegyekFunc);
             })(i);
         }
         for(var i = 0; i < hianyzasokButtons.length; i++) {
             (function(index) {
-                hianyzasokButtons[index].addEventListener("click", hianyzasok2);
+                hianyzasokButtons[index].addEventListener("click", hianyzasokFunc);
             })(i);
         }
         for(var i = 0; i < logoutButtons.length; i++) {
@@ -177,14 +182,16 @@ function saveLoginDatas(user){
 }
 
 function updateUserDatas(){
-    kreta.getUserDatas(loginDatas["access_token"], loginDatas["InstituteCode"], null, null).then(function(result){
-        saveUserDatas(result);
-    }, function(){
-        kreta.refreshToken(loginDatas['refresh_token'], loginDatas['InstituteCode']).then(function(result){
-            saveLoginDatas(result);
-            updateUserDatas();
+    return new Promise(function(resolve, reject) {
+        kreta.getUserDatas(loginDatas["access_token"], loginDatas["InstituteCode"], null, null).then(function(result){
+            saveUserDatas(result);
         }, function(){
-            showPage("login", true);
+            kreta.refreshToken(loginDatas['refresh_token'], loginDatas['InstituteCode']).then(function(result){
+                saveLoginDatas(result);
+                updateUserDatas();
+            }, function(){
+                showPage("login", true);
+            });
         });
     });
 
@@ -193,22 +200,10 @@ function updateUserDatas(){
 function saveUserDatas(data, callback){
     userDatas = data;
     var json = JSON.stringify(data);
+    function callback(){
+        console.log("Successfully updated user.json!");
+    }
     fs.writeFile('./user.json', json, 'utf8', callback);  
-    /*
-    kreta.getUserDatas(loginDatas["access_token"], loginDatas["InstituteCode"], null, null).then(function(result){
-        var json = JSON.stringify(result);
-        function callback(){
-            console.log("Successfully updated user.json!");
-        }
-        fs.writeFile('./user.json', json, 'utf8', callback);  
-    }, function(){
-        kreta.refreshToken(loginDatas['refresh_token'], loginDatas['InstituteCode']).then(function(result){
-            saveLoginDatas(result);
-            updateUserDatas();
-        }, function(){
-            showPage("login", true);
-        });
-    });*/
 }
 
 function loadUserDatas(){
@@ -290,9 +285,191 @@ function renderFooldal(){
     });
 }
 
-function renderJegyeim(){
-    loadUserDatas().then(function(result){
-        if(!isJegyeimLoadedOnce){
+function renderGrades(){
+    if(!isJegyeimLoadedOnce){
+        loadUserDatas().then(function(result){
+            /* document.getElementById("nav4real").innerHTML += `
+            <div class="nav-content">
+              <ul class="tabs tabs-transparent">
+                <li class="tab"><a href="#test1">Évközi jegyek</a></li>
+                <li class="tab"><a href="#test2">Félévi jegyek</a></li>
+              </ul>
+            </div>`;*/
+            result['Evaluations'].forEach(function(element){
+                var isThisContains = false;
+                for(var i = 0; i < jegyek[element['Type']].length; i++){
+                    if(jegyek[element['Type']][i]['name'] == element['Subject']){
+                        isThisContains = true;
+                    }
+                }
+                if(!isThisContains){
+                    var subjectName = element['Subject'];
+                    if(element['Subject'] == null){
+                        if(element['Form'] == "Deportment"){
+                            subjectName = "Magatartás";
+                        } else {
+                            subjectName = "Szorgalom";
+                        }
+                    }
+                    var subj = {
+                        "name": subjectName,
+                        "grades": []
+                    };
+                    jegyek[element['Type']].push(subj);
+                }
+            });
+
+            
+            result['Evaluations'].forEach(function(element){
+                for(var i = 0; i < jegyek[element['Type']].length; i++){
+                    var subjectName = element['Subject'];
+                    if(element['Subject'] == null){
+                        if(element['Form'] == "Deportment"){
+                            subjectName = "Magatartás";
+                        } else {
+                            subjectName = "Szorgalom";
+                        }
+                    }
+                    if(jegyek[element['Type']][i]['name'] == subjectName){
+                        var jegy = {
+                            "CreatingTime": element['CreatingTime'],
+                            "Date": element['Date'],
+                            "FormName": element['FormName'],
+                            "Mode": element['Mode'],
+                            "NumberValue": element['NumberValue'],
+                            "Teacher": element['Teacher'],
+                            "Theme": element['Theme'],
+                            "TypeName": element['TypeName'],
+                            "Value": element['Value'],
+                            "Weight": element['Weight']
+                        }
+                        jegyek[element['Type']][i]['grades'].push(jegy);
+                    }
+                }
+            });/*
+            <div class="col s12">
+                <ul class="tabs">
+                <li class="tab col s3"><a href="#test1">Test 1</a></li>
+                <li class="tab col s3"><a class="active" href="#test2">Test 2</a></li>
+                <li class="tab col s3 disabled"><a href="#test3">Disabled Tab</a></li>
+                <li class="tab col s3"><a href="#test4">Test 4</a></li>
+                </ul>
+            </div>
+            <div id="test1" class="col s12">Test 1</div>
+            <div id="test2" class="col s12">Test 2</div>
+            <div id="test3" class="col s12">Test 3</div>
+            <div id="test4" class="col s12">Test 4</div>*/
+            var row = document.createElement("div");
+            row.classList.add("row");
+            var tabs = document.createElement("div");
+            var ul = document.createElement("ul");
+            ul.classList.add("tabs");
+            for(var i = 0; i < 3; i++){
+                var nameOfType;
+                switch(i){
+                    case 0:
+                        nameOfType = "MidYear";
+                        break;
+                    case 1:
+                        nameOfType = "HalfYear";
+                        break;
+                    default:
+                        nameOfType = "EndYear";
+                        break;
+                }
+                
+                var link = document.createElement("a");
+                link.classList.add("active");
+                link.href = `#${nameOfType}`;
+                var displayName;
+                switch (nameOfType) {
+                    case "MidYear":
+                        displayName = "Évközi jegyek";
+                        break;
+                    case "HalfYear":
+                        displayName = "Félévi jegyek";
+                        break;
+                    default:
+                        displayName = "Évvégi jegyek";
+                        break;
+                }
+                link.innerHTML = displayName;
+                var li = document.createElement("li");
+                li.classList.add("tab");
+                li.classList.add("col");
+                li.classList.add("s4");
+                if(jegyek[nameOfType].length == 0){
+                    li.classList.add("disabled");
+                }
+                li.appendChild(link);
+                ul.appendChild(li);
+            }
+            tabs.appendChild(ul);
+
+            row.appendChild(tabs);
+            document.getElementById("jegyek").appendChild(row);
+            /*
+            <div id="MidYear" class="col s12">Test 1</div>
+            <div id="HalfYear" class="col s12">Test 2</div>
+            <div id="EndYear" class="col s12">Test 3</div>
+            */
+           for(var i = 0; i < 3; i++){
+                var nameOfType;
+                switch(i){
+                    case 0:
+                        nameOfType = "MidYear";
+                        break;
+                    case 1:
+                        nameOfType = "HalfYear";
+                        break;
+                    default:
+                        nameOfType = "EndYear";
+                        break;
+                }
+                var typeContainer = document.createElement("div");
+                typeContainer.classList.add("col");
+                typeContainer.classList.add("s12");
+                typeContainer.id = nameOfType;
+                for(var j = 0; j < jegyek[nameOfType].length; j++){
+                    //console.log(jegyek[nameOfType][j]["name"]);
+                    var subject = document.createElement("div");
+                    subject.classList.add("flow-text");
+                    subject.classList.add("col");
+                    subject.classList.add("s12");
+                    subject.classList.add("white-text");
+                    subject.innerHTML = jegyek[nameOfType][j]["name"];
+                    //typeContainer.innerHTML += `<b><div class="flow-text col s12 white-text">${jegyek[nameOfType][j]["name"]}</div></b>`;
+                    typeContainer.appendChild(subject);
+                        for(var k = 0; k < jegyek[nameOfType][j]['grades'].length; k++){
+                            //console.log(`${jegyek[nameOfType][j]['name']} - ${jegyek[nameOfType][j]['grades'][k]['NumberValue']}`)
+                            var cardContainer = document.createElement("div");
+                            cardContainer.classList.add("col");
+                            cardContainer.classList.add("s12");
+                            cardContainer.classList.add("m4");
+
+                            var card = document.createElement("div");
+                            card.classList.add("card");
+
+                            var cardContent = document.createElement("div");
+                            cardContent.classList.add("card-content");
+
+                            var cardTitle = document.createElement("div");
+                            cardTitle.classList.add("card-title");
+                            cardTitle.classList.add("truncate");
+                            cardTitle.innerHTML = jegyek[nameOfType][j]['grades'][k]["Value"];
+
+                            cardContent.appendChild(cardTitle);
+                            card.appendChild(cardContent);
+                            cardContainer.appendChild(card);
+                            typeContainer.appendChild(cardContainer);
+                        }
+                }
+                row.appendChild(typeContainer);
+                document.getElementById("jegyek").appendChild(row);
+            }
+
+            M.AutoInit();
+            /*
             result['Evaluations'].forEach(function(element){
                 if(element['Form'] == "Mark" && element['Type'] == "MidYear"){
                     var cardContainer = document.createElement("div");
@@ -316,16 +493,15 @@ function renderJegyeim(){
                     cardContainer.appendChild(card);
                     document.getElementById("jegyek").appendChild(cardContainer);
                 }
-            });
+            });*/
             isJegyeimLoadedOnce = true;
-        }
-    });
+        });
+    }
 }
 
-function renderHianyzasok(){
-    loadUserDatas().then(function(result){
-        if(!isHianyzasokLoadedOnce){
-            // Put every unique element to hianyzasok array
+function renderAbsences(){
+    if (!isHianyzasokLoadedOnce) {
+        loadUserDatas().then(function(result){
             result['Absences'].forEach(function(element){
                 var isHianyzasokContainsDay = false;
                 hianyzasok.forEach(function(element2){
@@ -335,56 +511,44 @@ function renderHianyzasok(){
                 });
                 if(!isHianyzasokContainsDay){
                     var day = {
+                        "AbsenceId": element['AbsenceId'],
                         "Date": element['LessonStartTime'],
-                        "Justification": element['JustificationState']
+                        "Justification": element['JustificationState'],
+                        "JustificationType": element['JustificationTypeName']
                     };
                     hianyzasok.push(day);
                 }
             });
-
-            // Loop throught hianyzasok to display them
-            hianyzasok.forEach(function(element){
+            hianyzasok.forEach(function (element) {
                 var cardContainer = document.createElement("div");
                 cardContainer.classList.add("col");
                 cardContainer.classList.add("s12");
                 cardContainer.classList.add("m4");
-                
+
                 var divLink = document.createElement("a");
                 divLink.classList.add("modal-trigger");
                 divLink.href = `#Absences-${element['AbsenceId']}`;
 
-                /*
-                <!-- Modal Structure -->
-                <div id="modal1" class="modal">
-                    <div class="modal-content">
-                    <h4>Modal Header</h4>
-                    <p>A bunch of text</p>
-                    </div>
-                    <div class="modal-footer">
-                    <a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
-                    </div>
-                </div>
-                */
-               var modal = document.createElement("div");
-               modal.classList.add("modal");
-               modal.id = `Absences-${element['AbsenceId']}`;
+                var modal = document.createElement("div");
+                modal.classList.add("modal");
+                modal.id = `Absences-${element['AbsenceId']}`;
 
-               var modalContent = document.createElement("div");
-               modalContent.classList.add("modal-content");
-               modalContent.innerHTML = `<h4>${element['Date'].split("T")[0].split("-")[0]}. ${element['Date'].split("T")[0].split("-")[1]}. ${element['Date'].split("T")[0].split("-")[2]}</h4><br>Igazolt-e? - ${element['Justification']}`;
+                var modalContent = document.createElement("div");
+                modalContent.classList.add("modal-content");
+                modalContent.innerHTML = `<h4>${element['Date'].split("T")[0].split("-")[0]}. ${element['Date'].split("T")[0].split("-")[1]}. ${element['Date'].split("T")[0].split("-")[2]}</h4><br>${element['Justification'] == "Justified" ? "Igazolt mulasztás" : element['Justification'] == "BeJustified" ? "Igazolandó mulasztás" : "Igazolatlan mulasztás"}<br>${element['JustificationType']}`;
 
-               modal.appendChild(modalContent);
-               document.getElementById("hianyzasok").appendChild(modal);
+                modal.appendChild(modalContent);
+                document.getElementById("hianyzasok").appendChild(modal);
 
-               var elems = document.querySelectorAll(`#Absences-${element['AbsenceId']}`);
-               var instances = M.Modal.init(elems, {});
+                var elems = document.querySelectorAll(`#Absences-${element['AbsenceId']}`);
+                var instances = M.Modal.init(elems, {});
 
                 var card = document.createElement("div");
                 card.classList.add("card");
                 card.classList.add("white-text");
-                if(element['Justification'] == "Justified"){
+                if (element['Justification'] == "Justified") {
                     card.classList.add("green");
-                } else if(element['Justification'] == "BeJustified"){
+                } else if (element['Justification'] == "BeJustified") {
                     card.classList.add("yellow");
                 } else {
                     card.classList.add("red");
@@ -405,8 +569,9 @@ function renderHianyzasok(){
                 document.getElementById("hianyzasok").appendChild(cardContainer);
             });
             isHianyzasokLoadedOnce = true;
-        }
-    });
+            
+        });
+    }
 }
 
 updateSchools().then(function(){
