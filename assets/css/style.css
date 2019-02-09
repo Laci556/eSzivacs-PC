@@ -32,3 +32,12 @@
 #jegyek .card {
     color: black !important;
 }
+
+.collapsible,
+.active{
+    border: 0px !important;
+}
+
+.collapsible-body{
+    background-color: #eeeeee;
+}

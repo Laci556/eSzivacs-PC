@@ -17,6 +17,7 @@ var jegyek = {
     "HalfYear": [],
     "EndYear": []
 };
+var currentPage;
 
 function updateSchools(){
     return new Promise(function(resolve, reject) {
@@ -48,6 +49,7 @@ function showPage(page, hideEveryThing){
         hidePage("jegyek");
         hidePage("hianyzasok");
     }
+    currentPage = page;
     document.getElementById(page).style.display = "block";
     if(page == "login"){
         showNavbar(false);
@@ -200,14 +202,15 @@ function updateUserDatas(){
     return new Promise(function(resolve, reject) {
         kreta.getUserDatas(loginDatas["access_token"], loginDatas["InstituteCode"], null, null).then(function(result){
             saveUserDatas(result);
+            showPage(currentPage, true);
         }, function(){
             kreta.refreshToken(loginDatas['refresh_token'], loginDatas['InstituteCode']).then(function(result){
                 saveLoginDatas(result);
                 updateUserDatas();
             }, function(){
-                M.Toast({html: 'Hiba lépett fel az adataid frissítése közben.'});
-                M.Toast({html: 'Kérlek jelentkezz be újra!'});
                 showPage("login", true);
+                M.toast({html: 'Hiba lépett fel az adataid frissítése közben.'});
+                M.toast({html: 'Kérlek jelentkezz be újra!'});
             });
         });
     });
@@ -670,11 +673,65 @@ function renderAbsences(){
                         "AbsenceId": element['AbsenceId'],
                         "Date": element['LessonStartTime'],
                         "Justification": element['JustificationState'],
-                        "JustificationType": element['JustificationTypeName']
+                        "JustificationType": element['JustificationTypeName'],
+                        "Lessons": []
                     };
                     hianyzasok.push(day);
                 }
             });
+            result['Absences'].forEach(function(element){
+                hianyzasok.forEach(function(element2){
+                    if(element['LessonStartTime'] == element2['Date']){
+                        element2['Lessons'].push(element['Subject']);
+                    }
+                });
+            });
+            /*
+            <ul class="collapsible">
+                <li>
+                    <div class="collapsible-header">1111. 11. 11.</div>
+                    <div class="collapsible-body">
+                        <ul class="collection">
+                            <li class="collection-item">Tanóra</li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            */
+            var ul = document.createElement("ul");
+            ul.classList.add("collapsible");
+            hianyzasok.forEach(function(element){
+                var li = document.createElement("li");
+                var header = document.createElement("div");
+                header.classList.add("collapsible-header");
+
+                header.innerHTML = `${element['Date'].split("T")[0].split("-")[0]}. ${element['Date'].split("T")[0].split("-")[1]}. ${element['Date'].split("T")[0].split("-")[2]} -&nbsp${element['Justification'] == "Justified" ? `<span class='green-text'>Igazolt mulasztás (${element['JustificationType']})</span>` : element['Justification'] == "BeJustified" ? "<span class='yellow-text'>Igazolandó mulasztás</span>" : "<span class='red-text'>Igazolatlan mulasztás</span>"}`;
+
+                var body = document.createElement("div");
+                body.classList.add("collapsible-body");
+
+                var collection = document.createElement("ul");
+                collection.classList.add("collection");
+
+                element['Lessons'].forEach(function(element2){
+                    var collLi = document.createElement("li");
+                    collLi.classList.add("collection-item");
+                    collLi.innerHTML = element2;
+
+                    collection.appendChild(collLi);    
+                });
+
+                body.appendChild(collection);
+                li.appendChild(header);
+                li.appendChild(body);
+                ul.appendChild(li);
+                document.getElementById("hianyzasok").appendChild(ul);
+            });
+
+            var elems = document.querySelectorAll('.collapsible');
+            var instances = M.Collapsible.init(elems, {});
+            
+            /*
             hianyzasok.forEach(function (element) {
                 var cardContainer = document.createElement("div");
                 cardContainer.classList.add("col");
@@ -724,6 +781,7 @@ function renderAbsences(){
                 cardContainer.appendChild(divLink);
                 document.getElementById("hianyzasok").appendChild(cardContainer);
             });
+            */
             isHianyzasokLoadedOnce = true;
             
         });
