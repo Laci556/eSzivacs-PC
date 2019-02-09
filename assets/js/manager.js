@@ -514,8 +514,12 @@ function renderMidYearGrades(row){
     container.classList.add("m6");
     container.classList.add("s12");
 
+    var collapsible = document.createElement("ul");
+    collapsible.classList.add("collapsible");
+    
     for(var j = 0; j < jegyek[nameOfType].length; j++){
         //console.log(jegyek[nameOfType][j]["name"]);
+        /*
         var subject = document.createElement("div");
         subject.classList.add("flow-text");
         subject.classList.add("col");
@@ -525,16 +529,53 @@ function renderMidYearGrades(row){
         //typeContainer.innerHTML += `<b><div class="flow-text col s12 white-text">${jegyek[nameOfType][j]["name"]}</div></b>`;
         container.appendChild(subject);
         typeContainer.appendChild(container);
-            for(var k = 0; k < jegyek[nameOfType][j]['grades'].length; k++){
-                var currentGrade = jegyek[nameOfType][j]['grades'][k];
-                //console.log(`${jegyek[nameOfType][j]['name']} - ${jegyek[nameOfType][j]['grades'][k]['NumberValue']}`)
-                var modal = document.createElement("div");
-                modal.classList.add("modal");
-                modal.id = `Grade-${currentGrade['Id']}`;
+        */
+        /*
+            <ul class="collapsible">
+                <li>
+                    <div class="collapsible-header">1111. 11. 11.</div>
+                    <div class="collapsible-body">
+                        <ul class="collection">
+                            <li class="collection-item">Tanóra</li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            */
+        var collLi = document.createElement("li");
 
-                var modalContent = document.createElement("div");
-                modalContent.classList.add("modal-content");
-                modalContent.innerHTML = `
+        var header = document.createElement("div");
+        header.classList.add("collapsible-header");
+        header.innerHTML = jegyek[nameOfType][j]['name'];
+
+        var body = document.createElement("div");
+        body.classList.add("collapsible-body");
+
+        var ul = document.createElement("ul");
+        ul.classList.add("collection");
+
+        for (var k = 0; k < jegyek[nameOfType][j]['grades'].length; k++) {
+            var currentGrade = jegyek[nameOfType][j]['grades'][k];
+
+            var cardLink = document.createElement("a");
+            cardLink.classList.add("modal-trigger");
+            cardLink.href = `#Grade-${currentGrade['Id']}`;
+
+            var li = document.createElement("li");
+            li.classList.add("collection-item");
+            li.innerHTML = currentGrade['Value'];
+
+            cardLink.appendChild(li);
+            ul.appendChild(cardLink);
+
+            //console.log(`${jegyek[nameOfType][j]['name']} - ${jegyek[nameOfType][j]['grades'][k]['NumberValue']}`)
+            var modal = document.createElement("div");
+            modal.classList.add("modal");
+            modal.id = `Grade-${currentGrade['Id']}`;
+
+            var modalContent = document.createElement("div");
+            modalContent.classList.add("modal-content");
+            modalContent.innerHTML = `
                 <h4>${jegyek["MidYear"][j]["name"]} - ${currentGrade['NumberValue']}</h4>
                 <table>
                     <tbody>
@@ -573,43 +614,50 @@ function renderMidYearGrades(row){
                     </tbody>
                 </table>`;
 
-                modal.appendChild(modalContent);
-                document.getElementById("jegyek").appendChild(modal);
+            modal.appendChild(modalContent);
+            document.getElementById("jegyek").appendChild(modal);
+            /*
+            var cardContainer = document.createElement("div");
+            cardContainer.classList.add("col");
+            cardContainer.classList.add("s12");
+            cardContainer.classList.add("m4");
 
-                var cardContainer = document.createElement("div");
-                cardContainer.classList.add("col");
-                cardContainer.classList.add("s12");
-                cardContainer.classList.add("m4");
+            var cardLink = document.createElement("a");
+            cardLink.classList.add("modal-trigger");
+            cardLink.href = `#Grade-${currentGrade['Id']}`;
 
-                var cardLink = document.createElement("a");
-                cardLink.classList.add("modal-trigger");
-                cardLink.href = `#Grade-${currentGrade['Id']}`;
+            var card = document.createElement("div");
+            card.classList.add("card");
 
-                var card = document.createElement("div");
-                card.classList.add("card");
+            var cardContent = document.createElement("div");
+            cardContent.classList.add("card-content");
 
-                var cardContent = document.createElement("div");
-                cardContent.classList.add("card-content");
+            var cardTitle = document.createElement("div");
+            cardTitle.classList.add("card-title");
+            cardTitle.classList.add("truncate");
 
-                var cardTitle = document.createElement("div");
-                cardTitle.classList.add("card-title");
-                cardTitle.classList.add("truncate");
+            cardTitle.innerHTML = `${currentGrade['Value']}`;
 
-                cardTitle.innerHTML = `${currentGrade['Value']}`;
+            cardContent.appendChild(cardTitle);
+            card.appendChild(cardContent);
+            cardLink.appendChild(card);
+            cardContainer.appendChild(cardLink);
+            container.appendChild(cardContainer);
+            typeContainer.appendChild(container);
+            */
 
-                cardContent.appendChild(cardTitle);
-                card.appendChild(cardContent);
-                cardLink.appendChild(card);
-                cardContainer.appendChild(cardLink);
-                container.appendChild(cardContainer);
-                typeContainer.appendChild(container);
 
-                var elems = document.querySelectorAll(`#Grade-${jegyek[nameOfType][j]['grades'][k]['Id']}`);
-                var instances = M.Modal.init(elems, {});
-            }
+            var elems = document.querySelectorAll(`#Grade-${jegyek[nameOfType][j]['grades'][k]['Id']}`);
+            var instances = M.Modal.init(elems, {});
+        }
+        body.appendChild(ul);
+        collLi.appendChild(header);
+        collLi.appendChild(body);
+        collapsible.appendChild(collLi);
     }
+    container.appendChild(collapsible);
+    typeContainer.appendChild(container);
     row.appendChild(typeContainer);
-    document.getElementById("jegyek").appendChild(row);
 }
 
 function renderSpecialGrades(nameOfType, displayName, row){
@@ -639,6 +687,7 @@ function renderSpecialGrades(nameOfType, displayName, row){
     ul.classList.add("collection");
     ul.classList.add("with-header");
 
+    
     var header = document.createElement("li");
     header.classList.add("collection-header");
     header.innerHTML = `<h4>${displayName}</h4>`;

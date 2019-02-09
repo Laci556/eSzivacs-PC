@@ -41,3 +41,7 @@
 .collapsible-body{
     background-color: #eeeeee;
 }
+
+.collection-item{
+    color: black !important;
+}
