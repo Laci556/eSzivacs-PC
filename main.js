@@ -11,7 +11,7 @@ let mainWindow
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 800,
+        width: 1052,
         height: 600,
         frame: false,
         webPreferences: {
@@ -32,12 +32,12 @@ function createWindow() {
         win.show()
     })*/
 
-    mainWindow.setMenu(null)
+    //mainWindow.setMenu(null)
 
     mainWindow.setResizable(true)
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools()
+    //mainWindow.webContents.openDevTools()
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
