@@ -337,48 +337,38 @@ loadLoginDatas().then(function (result) {
 
 
 function renderFooldal() {
-    loadUserDatas(loginDatas['access_token'], loginDatas['InstituteCode']).then(function (result) {
+    loadUserDatas().then(function (result) {
         if (!isFooldalLoadedOnce) {
-            var cardContainer = document.createElement("div");
-            cardContainer.classList.add("col");
-            cardContainer.classList.add("s12");
-            cardContainer.classList.add("m4");
-            var cardJegyek = document.createElement("div");
-            cardJegyek.classList.add("card");
-            var ul = document.createElement("ul");
-            ul.classList.add("collection");
-            ul.classList.add("with-header");
-            var ulHeader = document.createElement("li");
-            ulHeader.classList.add("collection-header");
-            ulHeader.innerHTML = '<li class="collection-header"><h4>Jegyek</h4></li>';
-            ul.appendChild(ulHeader);
-            var i = 0;
-            while (i < 5) {
-                if (result['Evaluations'][i]['Form'] == "Mark" && result['Evaluations'][i]['Type'] == "MidYear") {
-                    var li = document.createElement("li");
-                    li.classList.add("collection-item");
-                    var liDiv = document.createElement("div");
-                    liDiv.classList.add("row");
-                    liDiv.innerHTML = `<p class="col s9 truncate">${result['Evaluations'][i]['Subject']}</p><p class="col s3">${result['Evaluations'][i]['NumberValue']}</p>`;
-                    li.appendChild(liDiv);
-                    ul.appendChild(li);
+            var gradesNumber = 0;
+            var strázsa = 0;
+            while(gradesNumber < 6){
+                if(result['Evaluations'][strázsa]['Type'] == "MidYear"){
+                    document.getElementById("fooldalGrades").innerHTML += `
+                    <li class="collection-item">
+                        <div>${result['Evaluations'][strázsa]['Subject']}<a href="#!" class="secondary-content">${result['Evaluations'][strázsa]['NumberValue'] > 0 ? result['Evaluations'][strázsa]['NumberValue'] : result['Evaluations'][strázsa]['Value']}</a></div>
+                    </li>
+                    `;
+                    gradesNumber++;
                 }
-                i++;
+                strázsa++;
             }
-            console.log(result);
-            cardJegyek.appendChild(ul);
-            cardContainer.appendChild(cardJegyek);
-            document.getElementById("fooldal").appendChild(cardContainer);
+            isFirstNote = true;
+            result['Notes'].forEach(function(element){
+                document.getElementById("fooldalNotes").innerHTML += `
+                <li>
+                    <ul class="collapsible">
+                        <li ${isFirstNote ? `class="active"` : ""}>
+                            <div class="collapsible-header">${element['Title']}</div>
+                            <div class="collapsible-body"><span>${element['Content']}</span></div>
+                        </li>
+                    </ul>
+                </li>
+                `;
+                isFirstNote = false;
+            });
+            M.Collapsible.init(document.querySelectorAll(".collapsible"), {});
             isFooldalLoadedOnce = true;
         }
-    }, function () {
-        kreta.refreshToken(loginDatas['refresh_token'], loginDatas['InstituteCode']).then(function (result) {
-            saveLoginDatas(result, loginDatas['InstituteCode']);
-            renderFooldal();
-        }, function () {
-            showPage("login");
-            hidePage("fooldal");
-        });
     });
 }
 
@@ -590,6 +580,7 @@ function renderGrades() {
                     document.getElementById("jegyek").appendChild(cardContainer);
                 }
             });*/
+            M.Collapsible.init(document.querySelectorAll(".collapsible"), {});
             isJegyeimLoadedOnce = true;
         });
     }

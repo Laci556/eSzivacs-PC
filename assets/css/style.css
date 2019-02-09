@@ -53,3 +53,20 @@
 #timetableTop .material-icons{
     color: white !important;
 }
+
+.collection.with-header .collection-header {
+    border-bottom: rgba(0, 0, 0, 0) !important;
+}
+
+.collapsible{
+    box-shadow: none !important;
+    margin: .5rem 0 0 0 !important;
+}
+
+#fooldalNotes .collapsible-header{
+    padding-left: 30px !important;
+}
+
+.timetableTab{
+    margin-bottom: 20px;
+}
