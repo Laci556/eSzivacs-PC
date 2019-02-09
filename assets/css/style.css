@@ -17,3 +17,18 @@
 .tabs .indicator {
     background-color: white !important;
 }
+
+.secondary-content {
+    float: right;
+    color: black !important;
+    font-weight: bold;
+    cursor: default;
+}
+
+.collection{
+    background-color: white !important;
+}
+
+#jegyek .card {
+    color: black !important;
+}

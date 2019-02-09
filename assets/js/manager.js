@@ -68,6 +68,21 @@ function logout(){
     loginDatas = undefined;
     showNavbar(false);
     showPage("login", true);
+    updateSchools().then(function(){
+        var elems = document.querySelectorAll('.autocomplete');
+        var data = {};
+        var i = 0;
+    
+        var data = {};
+        for (var i = 0; i < schools.length; i++) {
+          data[schools[i].InstituteCode] = null; 
+        }
+        
+        var instances = M.Autocomplete.init(elems, {
+            "data": data,
+            "limit": 5
+        });
+    });
 }
 
 function updateMyDatas(){
@@ -190,6 +205,8 @@ function updateUserDatas(){
                 saveLoginDatas(result);
                 updateUserDatas();
             }, function(){
+                M.Toast({html: 'Hiba lépett fel az adataid frissítése közben.'});
+                M.Toast({html: 'Kérlek jelentkezz be újra!'});
                 showPage("login", true);
             });
         });
@@ -313,13 +330,23 @@ function renderGrades(){
                     }
                     var subj = {
                         "name": subjectName,
-                        "grades": []
+                        "grades": [],
+                        "avg": 0,
+                        "classAvg": 0
                     };
                     jegyek[element['Type']].push(subj);
                 }
             });
-
             
+            jegyek["MidYear"].forEach(function(element){
+                result['SubjectAverages'].forEach(function(element2){
+                    if(element2['Subject'] == element['name']){
+                        element['avg'] = element2['Value'];
+                        element['classAvg'] = element2['ClassValue'];
+                    }
+                });
+            });
+
             result['Evaluations'].forEach(function(element){
                 for(var i = 0; i < jegyek[element['Type']].length; i++){
                     var subjectName = element['Subject'];
@@ -332,6 +359,7 @@ function renderGrades(){
                     }
                     if(jegyek[element['Type']][i]['name'] == subjectName){
                         var jegy = {
+                            "Id": element['EvaluationId'],
                             "CreatingTime": element['CreatingTime'],
                             "Date": element['Date'],
                             "FormName": element['FormName'],
@@ -346,19 +374,8 @@ function renderGrades(){
                         jegyek[element['Type']][i]['grades'].push(jegy);
                     }
                 }
-            });/*
-            <div class="col s12">
-                <ul class="tabs">
-                <li class="tab col s3"><a href="#test1">Test 1</a></li>
-                <li class="tab col s3"><a class="active" href="#test2">Test 2</a></li>
-                <li class="tab col s3 disabled"><a href="#test3">Disabled Tab</a></li>
-                <li class="tab col s3"><a href="#test4">Test 4</a></li>
-                </ul>
-            </div>
-            <div id="test1" class="col s12">Test 1</div>
-            <div id="test2" class="col s12">Test 2</div>
-            <div id="test3" class="col s12">Test 3</div>
-            <div id="test4" class="col s12">Test 4</div>*/
+            });
+
             var row = document.createElement("div");
             row.classList.add("row");
             var tabs = document.createElement("div");
@@ -408,14 +425,9 @@ function renderGrades(){
 
             row.appendChild(tabs);
             document.getElementById("jegyek").appendChild(row);
-            /*
-            <div id="MidYear" class="col s12">Test 1</div>
-            <div id="HalfYear" class="col s12">Test 2</div>
-            <div id="EndYear" class="col s12">Test 3</div>
-            */
-           for(var i = 0; i < 3; i++){
+            for (var i = 0; i < 3; i++) {
                 var nameOfType;
-                switch(i){
+                switch (i) {
                     case 0:
                         nameOfType = "MidYear";
                         break;
@@ -426,46 +438,28 @@ function renderGrades(){
                         nameOfType = "EndYear";
                         break;
                 }
-                var typeContainer = document.createElement("div");
-                typeContainer.classList.add("col");
-                typeContainer.classList.add("s12");
-                typeContainer.id = nameOfType;
-                for(var j = 0; j < jegyek[nameOfType].length; j++){
-                    //console.log(jegyek[nameOfType][j]["name"]);
-                    var subject = document.createElement("div");
-                    subject.classList.add("flow-text");
-                    subject.classList.add("col");
-                    subject.classList.add("s12");
-                    subject.classList.add("white-text");
-                    subject.innerHTML = jegyek[nameOfType][j]["name"];
-                    //typeContainer.innerHTML += `<b><div class="flow-text col s12 white-text">${jegyek[nameOfType][j]["name"]}</div></b>`;
-                    typeContainer.appendChild(subject);
-                        for(var k = 0; k < jegyek[nameOfType][j]['grades'].length; k++){
-                            //console.log(`${jegyek[nameOfType][j]['name']} - ${jegyek[nameOfType][j]['grades'][k]['NumberValue']}`)
-                            var cardContainer = document.createElement("div");
-                            cardContainer.classList.add("col");
-                            cardContainer.classList.add("s12");
-                            cardContainer.classList.add("m4");
 
-                            var card = document.createElement("div");
-                            card.classList.add("card");
-
-                            var cardContent = document.createElement("div");
-                            cardContent.classList.add("card-content");
-
-                            var cardTitle = document.createElement("div");
-                            cardTitle.classList.add("card-title");
-                            cardTitle.classList.add("truncate");
-                            cardTitle.innerHTML = jegyek[nameOfType][j]['grades'][k]["Value"];
-
-                            cardContent.appendChild(cardTitle);
-                            card.appendChild(cardContent);
-                            cardContainer.appendChild(card);
-                            typeContainer.appendChild(cardContainer);
-                        }
+                var displayName;
+                switch (nameOfType) {
+                    case "MidYear":
+                        displayName = "Évközi jegyek";
+                        break;
+                    case "HalfYear":
+                        displayName = "Félévi jegyek";
+                        break;
+                    default:
+                        displayName = "Évvégi jegyek";
+                        break;
                 }
-                row.appendChild(typeContainer);
-                document.getElementById("jegyek").appendChild(row);
+
+                switch (nameOfType) {
+                    case "MidYear":
+                        renderMidYearGrades(row);
+                        break;
+                    default:
+                        renderSpecialGrades(nameOfType, displayName, row);
+                        break;
+                }
             }
 
             M.AutoInit();
@@ -497,6 +491,168 @@ function renderGrades(){
             isJegyeimLoadedOnce = true;
         });
     }
+}
+
+function renderMidYearGrades(row){
+    var nameOfType = "MidYear";
+    var typeContainer = document.createElement("div");
+    typeContainer.classList.add("col");
+    typeContainer.classList.add("s12");
+    typeContainer.id = nameOfType;
+
+    var spacing = document.createElement("div");
+    spacing.classList.add("col");
+    spacing.classList.add("hide-on-small");
+    spacing.classList.add("m3");
+    typeContainer.appendChild(spacing);
+
+    var container = document.createElement("div");
+    container.classList.add("col");
+    container.classList.add("m6");
+    container.classList.add("s12");
+
+    for(var j = 0; j < jegyek[nameOfType].length; j++){
+        //console.log(jegyek[nameOfType][j]["name"]);
+        var subject = document.createElement("div");
+        subject.classList.add("flow-text");
+        subject.classList.add("col");
+        subject.classList.add("s12");
+        subject.classList.add("white-text");
+        subject.innerHTML = `${jegyek["MidYear"][j]["name"]} – ${jegyek["MidYear"][j]["avg"]}`;
+        //typeContainer.innerHTML += `<b><div class="flow-text col s12 white-text">${jegyek[nameOfType][j]["name"]}</div></b>`;
+        container.appendChild(subject);
+        typeContainer.appendChild(container);
+            for(var k = 0; k < jegyek[nameOfType][j]['grades'].length; k++){
+                var currentGrade = jegyek[nameOfType][j]['grades'][k];
+                //console.log(`${jegyek[nameOfType][j]['name']} - ${jegyek[nameOfType][j]['grades'][k]['NumberValue']}`)
+                var modal = document.createElement("div");
+                modal.classList.add("modal");
+                modal.id = `Grade-${currentGrade['Id']}`;
+
+                var modalContent = document.createElement("div");
+                modalContent.classList.add("modal-content");
+                modalContent.innerHTML = `
+                <h4>${jegyek["MidYear"][j]["name"]} - ${currentGrade['NumberValue']}</h4>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><b>Értékelés módja</b></td>
+                            <td>${currentGrade['TypeName']}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Értékelés témája</b></td>
+                            <td>${currentGrade['Theme']}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Értékelés súlya</b></td>
+                            <td>${currentGrade['Weight']}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Tanár</b></td>
+                            <td>${currentGrade['Teacher']}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Értékelés</b></td>
+                            <td>${currentGrade['Value']}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Dátum</b></td>
+                            <td>${currentGrade['Date'].split("T")[0].split("-")[0]}. ${currentGrade['Date'].split("T")[0].split("-")[1]}. ${currentGrade['Date'].split("T")[0].split("-")[2]}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Rögzítés ideje</b></td>
+                            <td>${currentGrade['CreatingTime'].split("T")[0].split("-")[0]}. ${currentGrade['CreatingTime'].split("T")[0].split("-")[1]}. ${currentGrade['CreatingTime'].split("T")[0].split("-")[2]}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Értékelés formája</b></td>
+                            <td>${currentGrade['FormName']}</td>
+                        </tr>
+                    </tbody>
+                </table>`;
+
+                modal.appendChild(modalContent);
+                document.getElementById("jegyek").appendChild(modal);
+
+                var cardContainer = document.createElement("div");
+                cardContainer.classList.add("col");
+                cardContainer.classList.add("s12");
+                cardContainer.classList.add("m4");
+
+                var cardLink = document.createElement("a");
+                cardLink.classList.add("modal-trigger");
+                cardLink.href = `#Grade-${currentGrade['Id']}`;
+
+                var card = document.createElement("div");
+                card.classList.add("card");
+
+                var cardContent = document.createElement("div");
+                cardContent.classList.add("card-content");
+
+                var cardTitle = document.createElement("div");
+                cardTitle.classList.add("card-title");
+                cardTitle.classList.add("truncate");
+
+                cardTitle.innerHTML = `${currentGrade['Value']}`;
+
+                cardContent.appendChild(cardTitle);
+                card.appendChild(cardContent);
+                cardLink.appendChild(card);
+                cardContainer.appendChild(cardLink);
+                container.appendChild(cardContainer);
+                typeContainer.appendChild(container);
+
+                var elems = document.querySelectorAll(`#Grade-${jegyek[nameOfType][j]['grades'][k]['Id']}`);
+                var instances = M.Modal.init(elems, {});
+            }
+    }
+    row.appendChild(typeContainer);
+    document.getElementById("jegyek").appendChild(row);
+}
+
+function renderSpecialGrades(nameOfType, displayName, row){
+    /*
+    <ul class="collection with-header">
+        <li class="collection-header"><h4>Félévi jegyek</h4></li>
+        <li class="collection-item"><div class="col s9 truncate">Tantárgy</div><div class="col s3 truncate">5</div></li>
+    </ul>
+    */
+    var typeContainer = document.createElement("div");
+    typeContainer.classList.add("col");
+    typeContainer.classList.add("s12");
+    typeContainer.id = nameOfType;
+
+    var spacing = document.createElement("div");
+    spacing.classList.add("col");
+    spacing.classList.add("hide-on-small");
+    spacing.classList.add("m3");
+    typeContainer.appendChild(spacing);
+
+    var ulContainer = document.createElement("div");
+    ulContainer.classList.add("col");
+    ulContainer.classList.add("m6");
+    ulContainer.classList.add("s12");
+
+    var ul = document.createElement("ul");
+    ul.classList.add("collection");
+    ul.classList.add("with-header");
+
+    var header = document.createElement("li");
+    header.classList.add("collection-header");
+    header.innerHTML = `<h4>${displayName}</h4>`;
+    ul.appendChild(header);
+    for(var j = 0; j < jegyek[nameOfType].length; j++){
+        for(var k = 0; k < jegyek[nameOfType][j]['grades'].length; k++){
+            var li = document.createElement("li");
+            li.classList.add("collection-item");
+            li.innerHTML = `<div>${jegyek[nameOfType][j]['name']}<a href="#" class="secondary-content">${jegyek[nameOfType][j]['grades'][k]["Value"]}</p></div>`;
+            ul.appendChild(li);
+            //cardTitle.innerHTML = jegyek[nameOfType][j]['grades'][k]["Value"];
+        }
+    }
+    ulContainer.appendChild(ul);
+    typeContainer.appendChild(ulContainer);
+    row.appendChild(typeContainer);
+    document.getElementById("jegyek").appendChild(row);
 }
 
 function renderAbsences(){
