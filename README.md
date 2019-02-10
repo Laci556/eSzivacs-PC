@@ -2,59 +2,53 @@
 
 [<p align="center"><img src="https://img.shields.io/travis/pepyta/eSzivacs-PC.svg?style=for-the-badge" alt="travis">](https://travis-ci.org/pepyta/eSzivacs-PC) [<img src="https://img.shields.io/github/downloads/pepyta/eSzivacs-PC/total.svg?style=for-the-badge" alt="downloads">](https://github.com/pepyta/eSzivacs-PC/releases) [![](https://img.shields.io/github/release/pepyta/eSzivacs-PC.svg?style=for-the-badge)](https://github.com/pepyta/eSzivacs-PC/releases/latest)</p>
 
-## Table of Contents
-- [Features](#features)
-- [Releases](#releases)
-- [Usage](#usage)
-- [TODO](#todo)
-- [Third-party licenses](#third-party-licenses)
-- [Contributors](#contributors)
-- [License](#license)
+## Tartalom
+- [Jellemzők](#jellemzők)
+- [Kiadások](#kiadások)
+- [Használat](#használat)
+- [Harmadik féltől származó szoftverek licenszei](#harmadik-féltől-származó-szoftverek-licenszei)
+- [Közreműködők](#közreműködők)
+- [Licensz](#licensz)
 
-## Releases
+## Kiadások
 
-| Platform (version) | Executable name |
+| Platform (verzió) | Fájl neve |
 | -------- | --------------- |
 | Windows x64 (v1.0.0) | [`eSzivacs.exe`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.0.0/eSzivacs.exe) |
 
-## Features
-- 🤖 Electron based GUI
-- 🗒️ Check your grades
-- 🌡️ Get absences
-- 📅 Query your timetable
+## Jellemzők
+- 🤖 Electron alapú felület
+- 🗒️ Jegyek lekérdezése
+- 🌡️ Hiányzások lekérése
+- 📅 Órarend megtekintése
 
-## Usage
-<b>Clone and install modules</b>
+## Használat
+<b>Klónozás és modulok telepítése</b>
 ```
 > git clone https://github.com/pepyta/eSzivacs-PC.git
 > cd eSzivacs-PC
 > npm install
 ```
 
-<b>Start electron client</b>
+<b>Program elindítása</b>
 ```
 > npm start
 ```
 
-<b>Create installer</b>
+<b>Telepítő létrehozása</b>
 ```
 > npm run dist
 ```
 
-<b>Building for a specific platform</b>
+<b>Egy adott platformra történő telepítő létrehozása</b>
 
-| Platform    | Command              |
+| Platform    | Parancs              |
 | ----------- | -------------------- |
 | Windows x64 | `npm run dist:win`   |
 | macOS       | `npm run dist:mac`   |
 | Linux x64   | `npm run dist:linux` |
 
-## TODO
-- Background service for notifications
-- Multi-user mode
-- Improved main page
-
-## Third-party licenses
+## Harmadik féltől származó szoftverek licenszei
 - [boapps/e-kreta-hidden-api-docs](https://raw.githubusercontent.com/boapps/e-kreta-api-docs/master/LICENSE)
 - [boapps/e-szivacs-2](https://raw.githubusercontent.com/boapps/e-Szivacs-2/master/LICENSE)
 - [electron/electron](https://github.com/electron/electron/blob/master/LICENSE)
@@ -64,9 +58,9 @@
 - [jinder/path](https://raw.githubusercontent.com/jinder/path/master/LICENSE)
 - [request/request](https://raw.githubusercontent.com/request/request/master/LICENSE)
 
-## Contributors
-Special thanks to [boapps](https://github.com/boapps/), who created [e-kreta-hidden-api-docs](https://github.com/boapps/e-kreta-api-docs)!
-## License
+## Közreműködők
+Külön köszönet [boapps](https://github.com/boapps/)-nak, aki létrehozta a [e-kreta-hidden-api-docs](https://github.com/boapps/e-kreta-api-docs)-t!
+## Licensz
 ```
 BSD 2-Clause License
 
