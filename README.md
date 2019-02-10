@@ -1,14 +1,21 @@
 <p align="center"><img src="assets/img/banner.png" width="60%"></p>
 
-[<p align="center"><img src="https://img.shields.io/travis/pepyta/eSzivacs-PC.svg?style=for-the-badge" alt="travis">](https://travis-ci.org/pepyta/eSzivacs-PC) [<img src="https://img.shields.io/github/downloads/pepyta/eSzivacs-PC/total.svg?style=for-the-badge" alt="downloads">](https://github.com/pepyta/eSzivacs-PC/releases)</p>
+[<p align="center"><img src="https://img.shields.io/travis/pepyta/eSzivacs-PC.svg?style=for-the-badge" alt="travis">](https://travis-ci.org/pepyta/eSzivacs-PC) [<img src="https://img.shields.io/github/downloads/pepyta/eSzivacs-PC/total.svg?style=for-the-badge" alt="downloads">](https://github.com/pepyta/eSzivacs-PC/releases) [![](https://img.shields.io/github/release/pepyta/eSzivacs-PC.svg?style=for-the-badge)](https://github.com/pepyta/eSzivacs-PC/releases/latest)</p>
 
 ## Table of Contents
 - [Features](#features)
+- [Releases](#releases)
 - [Usage](#usage)
 - [TODO](#todo)
 - [Third-party licenses](#third-party-licenses)
 - [Contributors](#contributors)
 - [License](#license)
+
+## Releases
+
+| Platform (version) | Executable name |
+| -------- | --------------- |
+| Windows x64 (v1.0.0) | [`eSzivacs.exe`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.0.0/eSzivacs.exe) |
 
 ## Features
 - 🤖 Electron based GUI
