@@ -80,7 +80,6 @@
     "materialize-css": "^1.0.0",
     "path": "^0.12.7",
     "request": "^2.88.0",
-    "url": "^0.11.0",
-    "electron-directory": "^0.0.3"
+    "url": "^0.11.0"
   }
 }
