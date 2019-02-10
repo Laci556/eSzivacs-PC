@@ -1,6 +1,7 @@
 const kreta = require('./js/kreta');
 const main = require('./js/main');
 const fs = require('fs');
+const app2 = require('electron').remote.app;
 
 M.AutoInit();
 
@@ -22,12 +23,30 @@ var currentPage;
 var timetableDatas = [];
 var positionInTime = 0;
 var startupTimetableLoad = false;
+var isFirstTime = true;
 
-
+var electronDirectory = require('electron-directory')
+  , dirHelper
+  , electronExecPath
+  , applicationJsPath
+  ;
+ 
+electronDirectory(__dirname)
+    .then(function(electronDirectoryInstance) {
+        dirHelper = electronDirectoryInstance;
+        return dirHelper.getElectronPath();
+    })
+    .then(function(info) {
+        electronExecPath = info;        
+        return dirHelper.getApplicationPath();
+    })
+    .then(function(info) {
+        applicationJsPath = info;
+    });
 function updateSchools() {
     return new Promise(function (resolve, reject) {
-        if (fs.existsSync("./schools.json")) {
-            fs.readFile('./schools.json', 'utf8', function (err, data) {
+        if (fs.existsSync(`${app2.getPath('userData')}/schools.json`)) {
+            fs.readFile(`${app2.getPath('userData')}/schools.json`, 'utf8', function (err, data) {
                 if (err) reject(err);
                 schools = JSON.parse(data);
                 resolve(schools);
@@ -39,7 +58,7 @@ function updateSchools() {
                 function callback() {
                     console.log("Successfully updated schools.json!");
                 }
-                fs.writeFile('./schools.json', json, 'utf8', callback);
+                fs.writeFile(`${app2.getPath('userData')}/schools.json`, json, 'utf8', callback);
 
                 resolve(schools);
             });
@@ -74,7 +93,7 @@ function showPage(page, hideEveryThing) {
 }
 
 function logout() {
-    fs.unlinkSync("./login.json");
+    fs.unlinkSync(`${app2.getPath('userData')}/login.json`);
     loginDatas = undefined;
     showNavbar(false);
     showPage("login", true);
@@ -99,11 +118,11 @@ function updateMyDatas() {
     kreta.getUserDatas(loginDatas["access_token"], loginDatas["InstituteCode"], null, null).then(function (result) {
         saveUserDatas(result, fooldal);
         //updateTimetable();
-        M.toast({ html: 'Sikeresen frissítetted az adataidat!' });
         isFooldalLoadedOnce = false;
         isHianyzasokLoadedOnce = false;
         isJegyeimLoadedOnce = false;
         location.reload();
+        M.toast({ html: 'Sikeresen frissítetted az adataidat!' });
 
 
     }, function () {
@@ -213,14 +232,14 @@ function hidePage(page) {
 
 function loadLoginDatas() {
     return new Promise(function (resolve, reject) {
-        if (fs.existsSync("./login.json")) {
-            fs.readFile('./login.json', 'utf8', function (err, data) {
+        if (fs.existsSync(`${app2.getPath('userData')}/login.json`)) {
+            fs.readFile(`${app2.getPath('userData')}/login.json`, 'utf8', function (err, data) {
                 if (err) reject(err);
                 user = JSON.parse(data);
                 resolve(user);
             });
         } else {
-            reject();
+            resolve("");
         }
     });
 }
@@ -229,22 +248,22 @@ function saveLoginDatas(user, InstituteCode) {
     loginDatas = user;
     user['InstituteCode'] = InstituteCode;
     var json = JSON.stringify(user);
-    function callback() {
-        console.log("Successfully updated login.json!");
+    function callback(){
+        console.log("login.json successfully updated")
     }
-    fs.writeFile('./login.json', json, 'utf8', callback);
+    fs.writeFile(`${app2.getPath('userData')}/login.json`, json, 'utf8', callback);
 }
 
 function loadTimetable() {
     return new Promise(function (resolve, reject) {
-        if (fs.existsSync("./timetable.json")) {
-            fs.readFile('./timetable.json', 'utf8', function (err, data) {
+        if (fs.existsSync(`${app2.getPath('userData')}/timetable.json`)) {
+            fs.readFile(`${app2.getPath('userData')}/timetable.json`, 'utf8', function (err, data) {
                 if (err) reject(err);
                 user = JSON.parse(data);
                 resolve(user);
             });
         } else {
-            reject();
+            resolve("");
         }
     });
 }
@@ -254,7 +273,7 @@ function saveTimetable(user) {
     function callback() {
         console.log("Successfully updated timetable.json!");
     }
-    fs.writeFile('./timetable.json', json, 'utf8', callback);
+    fs.writeFile(`${app2.getPath('userData')}/timetable.json`, json, 'utf8', callback);
 }
 
 function updateTimetable(startDate, endDate) {
@@ -299,15 +318,20 @@ function saveUserDatas(data, callback) {
     var json = JSON.stringify(data);
     function callback() {
         console.log("Successfully updated user.json!");
+        if(isFirstTime){
+            isFirstTime = false;
+            location.reload();
+            M.toast({html: "Sikeres bejelentkezés!"});
+        }
     }
-    fs.writeFile('./user.json', json, 'utf8', callback);
+    fs.writeFile(`${app2.getPath('userData')}/user.json`, json, 'utf8', callback);
 }
 
 function loadUserDatas() {
     return new Promise(function (resolve, reject) {
-        if (fs.existsSync("./user.json")) {
+        if (fs.existsSync(`${app2.getPath('userData')}/user.json`)) {
             console.log("Load from user.json!");
-            fs.readFile('./user.json', 'utf8', function (err, data) {
+            fs.readFile(`${app2.getPath('userData')}/user.json`, 'utf8', function (err, data) {
                 if (err) reject(err);
                 user = JSON.parse(data);
                 userDatas = user;
@@ -337,24 +361,24 @@ loadLoginDatas().then(function (result) {
 
 
 function renderFooldal() {
-    loadUserDatas().then(function (result) {
-        if (!isFooldalLoadedOnce) {
-            var gradesNumber = 0;
-            var strázsa = 0;
-            while(gradesNumber < 6){
-                if(result['Evaluations'][strázsa]['Type'] == "MidYear"){
-                    document.getElementById("fooldalGrades").innerHTML += `
+        loadUserDatas().then(function (result) {
+            if (!isFooldalLoadedOnce) {
+                var gradesNumber = 0;
+                var strázsa = 0;
+                while (gradesNumber < 6) {
+                    if (result['Evaluations'][strázsa]['Type'] == "MidYear") {
+                        document.getElementById("fooldalGrades").innerHTML += `
                     <li class="collection-item">
                         <div>${result['Evaluations'][strázsa]['Subject']}<a href="#!" class="secondary-content">${result['Evaluations'][strázsa]['NumberValue'] > 0 ? result['Evaluations'][strázsa]['NumberValue'] : result['Evaluations'][strázsa]['Value']}</a></div>
                     </li>
                     `;
-                    gradesNumber++;
+                        gradesNumber++;
+                    }
+                    strázsa++;
                 }
-                strázsa++;
-            }
-            isFirstNote = true;
-            result['Notes'].forEach(function(element){
-                document.getElementById("fooldalNotes").innerHTML += `
+                isFirstNote = true;
+                result['Notes'].forEach(function (element) {
+                    document.getElementById("fooldalNotes").innerHTML += `
                 <li>
                     <ul class="collapsible">
                         <li ${isFirstNote ? `class="active"` : ""}>
@@ -364,12 +388,12 @@ function renderFooldal() {
                     </ul>
                 </li>
                 `;
-                isFirstNote = false;
-            });
-            M.Collapsible.init(document.querySelectorAll(".collapsible"), {});
-            isFooldalLoadedOnce = true;
-        }
-    });
+                    isFirstNote = false;
+                });
+                M.Collapsible.init(document.querySelectorAll(".collapsible"), {});
+                isFooldalLoadedOnce = true;
+            }
+        });
 }
 
 function renderGrades() {

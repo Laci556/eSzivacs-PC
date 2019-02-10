@@ -1,15 +1,75 @@
 {
   "name": "eszivacs-pc",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0.0",
+  "description": "Egy non-profit kliens a Kréta rendszerhez, diákoknak.",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "cilinux": "electron-builder --linux --win",
+    "cidarwin": "electron-builder --mac",
+    "dist": "cross-env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder",
+    "dist:win": "npm run dist -- --win --x64",
+    "dist:mac": "npm run dist -- --mac",
+    "dist:linux": "npm run dist -- --linux --x64"
   },
   "author": "Gál Péter (pepyta)",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^4.0.2"
+    "electron": "^4.0.2",
+    "cross-env": "^5.2.0",
+    "electron-builder": "^20.38.5"
+  },
+  "build": {
+    "appId": "eszivacspc",
+    "productName": "eSzivacs",
+    "artifactName": "${productName}.${ext}",
+    "copyright": "Copyright © 2019 Gál Péter",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": "x64"
+        }
+      ],
+      "icon": "assets/img/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "installerIcon": "assets/img/icon.ico",
+      "uninstallerIcon": "assets/img/icon.ico",
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.education"
+    },
+    "linux": {
+      "target": "AppImage",
+      "maintainer": "Gál Péter",
+      "vendor": "eSzivacs",
+      "synopsis": "eSzivacs client for your school profile",
+      "description": "This is a custom client to communicate with Kréta servers to get your profile informations (eg.: grades, timetable, absences)",
+      "category": "Education"
+    },
+    "deb": {
+      "compression": "xz",
+      "packageCategory": "Education",
+      "priority": "optional"
+    },
+    "compression": "maximum",
+    "files": [
+      "!{dist,.gitignore,.vscode,docs,.travis.yml}"
+    ],
+    "extraResources": [
+      "libraries"
+    ],
+    "asar": true
   },
   "dependencies": {
     "async": "^2.6.1",
@@ -20,6 +80,7 @@
     "materialize-css": "^1.0.0",
     "path": "^0.12.7",
     "request": "^2.88.0",
-    "url": "^0.11.0"
+    "url": "^0.11.0",
+    "electron-directory": "^0.0.3"
   }
 }
