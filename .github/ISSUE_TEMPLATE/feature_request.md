@@ -1,20 +1,17 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: Javaslat
+about: Mivel tehetnénk jobbá az alkalmazást?
 title: ''
-labels: ''
+labels: 'enhancement'
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**A javaslatod egy hibával kapcsolatos? Kérlek, írd le!**
+EGy könnyen érthatő leírás a problémáról. pl.: Nagyon idegesítő, hogy [...]
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Mit szeretnél az alkalmazásba?**
+Írd le, hogy mit szeretnél, hogy az alkalmazásunk csináljon!
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**További információk**
+Bármilyen további információd van azt ide írd! (pl.: képernyőkép, rajz, diagram, stb.)
