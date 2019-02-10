@@ -2,7 +2,7 @@
 name: Hibajelentés
 about: Írj egy hibajelentést, hogy ki tudjuk javítani az alkalmazásban!
 title: ''
-labels: ''
+labels: 'bug'
 assignees: ''
 
 ---
