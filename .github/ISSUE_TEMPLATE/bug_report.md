@@ -1,32 +1,31 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Hibajelentés
+about: Írj egy hibajelentést, hogy ki tudjuk javítani az alkalmazásban!
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Hiba leírása**
+Egy pontos és nem félreérthető leírása a hibának.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Hogyan idézhetjük elő?**
+Néhány lépés, amivel előidézhető a hiba:
+1. Menj a '...'-hoz
+2. Kattints a '....'-ra
+3. Görgess le a '....'-hoz
+4. HIBA!
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**Hogyan kéne működnie?**
+Mit kéne látnod, amikor az eset történik?
 
-**Screenshots**
+**Képernyőképek**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Specifikációk (please complete the following information):**
+ - OS: [pl.: Windows x64]
+ - Verzió: [pl.: v1.0.0]
 
-**Additional context**
-Add any other context about the problem here.
+**További információk**
+Ha van bármi további információd a problémával kapcsolatban azt ide írd!
