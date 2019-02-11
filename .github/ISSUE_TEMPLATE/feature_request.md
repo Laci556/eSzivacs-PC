@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 **A javaslatod egy hibával kapcsolatos? Kérlek, írd le!**
-EGy könnyen érthatő leírás a problémáról. pl.: Nagyon idegesítő, hogy [...]
+Egy könnyen érthető leírás a problémáról. pl.: Nagyon idegesítő, hogy [...]
 
 **Mit szeretnél az alkalmazásba?**
 Írd le, hogy mit szeretnél, hogy az alkalmazásunk csináljon!
