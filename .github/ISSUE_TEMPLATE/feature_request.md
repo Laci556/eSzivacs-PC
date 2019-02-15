@@ -2,7 +2,7 @@
 name: Javaslat
 about: Mivel tehetnénk jobbá az alkalmazást?
 title: ''
-labels: 'enhancement'
+labels: 'ötlet'
 assignees: ''
 
 ---
