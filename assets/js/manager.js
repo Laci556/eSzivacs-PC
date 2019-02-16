@@ -1143,7 +1143,7 @@ document.querySelector("#login").addEventListener("submit", function (e) {
         // Some toast to make login look cool
         M.toast({ html: 'Sikeres bejelentkezés!' });
         // Save login datas
-        saveLoginDatas(result, document.getElementById("schools").value);
+        saveLoginDatas(result, instituteCode);
         // Show the main page
         showPage("fooldal");
         // Hide logging in

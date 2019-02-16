@@ -57,3 +57,20 @@ body {
 	padding: 12px;	
 	color: #CCCCCC;
 }
+
+::-webkit-scrollbar {
+	width: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+	background: #616161;
+  }
+   
+  ::-webkit-scrollbar-thumb {
+	background: #000; 
+	border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+	background: #000; 
+  }
