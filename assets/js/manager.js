@@ -25,24 +25,6 @@ var positionInTime = 0;
 var startupTimetableLoad = false;
 var isFirstTime = true;
 
-var electronDirectory = require('electron-directory')
-  , dirHelper
-  , electronExecPath
-  , applicationJsPath
-  ;
- 
-electronDirectory(__dirname)
-    .then(function(electronDirectoryInstance) {
-        dirHelper = electronDirectoryInstance;
-        return dirHelper.getElectronPath();
-    })
-    .then(function(info) {
-        electronExecPath = info;        
-        return dirHelper.getApplicationPath();
-    })
-    .then(function(info) {
-        applicationJsPath = info;
-    });
 function updateSchools() {
     return new Promise(function (resolve, reject) {
         if (fs.existsSync(`${app2.getPath('userData')}/schools.json`)) {
@@ -97,21 +79,7 @@ function logout() {
     loginDatas = undefined;
     showNavbar(false);
     showPage("login", true);
-    updateSchools().then(function () {
-        var elems = document.querySelectorAll('.autocomplete');
-        var data = {};
-        var i = 0;
-
-        var data = {};
-        for (var i = 0; i < schools.length; i++) {
-            data[schools[i].InstituteCode] = null;
-        }
-
-        var instances = M.Autocomplete.init(elems, {
-            "data": data,
-            "limit": 5
-        });
-    });
+    initAutoCompleteForLoginSchools();
 }
 
 function updateMyDatas() {
@@ -131,6 +99,24 @@ function updateMyDatas() {
             updateUserDatas();
         }, function () {
             showPage("login", true);
+        });
+    });
+}
+
+function initAutoCompleteForLoginSchools(){
+    updateSchools().then(function () {
+        var elems = document.querySelectorAll('#schools');
+        var data = {};
+        var i = 0;
+
+        var data = {};
+        for (var i = 0; i < schools.length; i++) {
+            data[schools[i].Name] = null;
+        }
+
+        var instances = M.Autocomplete.init(elems, {
+            "data": data,
+            "limit": 5
         });
     });
 }
@@ -1138,25 +1124,19 @@ function renderAbsences() {
     }
 }
 
-updateSchools().then(function () {
-    var elems = document.querySelectorAll('.autocomplete');
-    var data = {};
-    var i = 0;
-
-    var data = {};
-    for (var i = 0; i < schools.length; i++) {
-        data[schools[i].InstituteCode] = null;
-    }
-
-    var instances = M.Autocomplete.init(elems, {
-        "data": data,
-        "limit": 5
-    });
-});
+initAutoCompleteForLoginSchools();
 
 // Handle logging in
 document.querySelector("#login").addEventListener("submit", function (e) {
-    kreta.loginUser(document.getElementById("schools").value, document.getElementById("username").value, document.getElementById("password").value).then(function (result) {
+    var instituteCode;
+
+    schools.forEach(function(element){
+        if(element.Name == document.getElementById("schools").value){
+            instituteCode = element.InstituteCode;
+        }
+    });
+
+    kreta.loginUser(instituteCode, document.getElementById("username").value, document.getElementById("password").value).then(function (result) {
         // Handling successful login
         // Storing school inside user.json
         //result["InstituteCode"] = document.getElementById("schools").value;
