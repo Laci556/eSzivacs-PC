@@ -1,5 +1,4 @@
 const kreta = require('./js/kreta');
-const main = require('./js/main');
 const fs = require('fs');
 const app2 = require('electron').remote.app;
 
@@ -16,6 +15,7 @@ var isOrarendLoadedOnce = false;
 var hianyzasok = [];
 var jegyek = {
     "MidYear": [],
+    "MidYearDate": [],
     "HalfYear": [],
     "EndYear": []
 };
@@ -24,6 +24,7 @@ var timetableDatas = [];
 var positionInTime = 0;
 var startupTimetableLoad = false;
 var isFirstTime = true;
+var gradesTabs;
 
 function updateSchools() {
     return new Promise(function (resolve, reject) {
@@ -418,6 +419,44 @@ function renderGrades() {
                 }
             });
 
+            result['Evaluations'].forEach(function (element) {
+                var isThisContains = false;
+                for (var i = 0; i < jegyek["MidYearDate"].length; i++) {
+                    if (jegyek["MidYearDate"][i]['date'] == element['Date']) {
+                        isThisContains = true;
+                    }
+                }
+                if (!isThisContains) {
+                    var subj = {
+                        "date": element['Date'],
+                        "grades": []
+                    };
+                    jegyek["MidYearDate"].push(subj);
+                }
+            });
+
+            result['Evaluations'].forEach(function (element) {
+                for (var i = 0; i < jegyek["MidYearDate"].length; i++) {
+                    if (jegyek["MidYearDate"][i]['date'] == element['Date']) {
+                        var jegy = {
+                            "Id": element['EvaluationId'],
+                            "Subject": element['Subject'],
+                            "CreatingTime": element['CreatingTime'],
+                            "Date": element['Date'],
+                            "FormName": element['FormName'],
+                            "Mode": element['Mode'],
+                            "NumberValue": element['NumberValue'],
+                            "Teacher": element['Teacher'],
+                            "Theme": element['Theme'],
+                            "TypeName": element['TypeName'],
+                            "Value": element['Value'],
+                            "Weight": element['Weight']
+                        }
+                        jegyek["MidYearDate"][i]['grades'].push(jegy);
+                    }
+                }
+            });
+            
             jegyek["MidYear"].forEach(function (element) {
                 result['SubjectAverages'].forEach(function (element2) {
                     if (element2['Subject'] == element['name']) {
@@ -462,6 +501,12 @@ function renderGrades() {
                 return 0;
             });
 
+            jegyek['MidYearDate'].sort(function (a, b) {
+                if (a.date < b.date) { return 1; }
+                if (a.date > b.date) { return -1; }
+                return 0;
+            });
+
             jegyek['HalfYear'].sort(function (a, b) {
                 if (a.name < b.name) { return -1; }
                 if (a.name > b.name) { return 1; }
@@ -483,6 +528,7 @@ function renderGrades() {
             tabs.classList.add("no-autoinit");
             var ul = document.createElement("ul");
             ul.classList.add("tabs");
+            ul.id = "gradesTabs";
             for (var i = 0; i < 3; i++) {
                 var nameOfType;
                 switch (i) {
@@ -492,7 +538,7 @@ function renderGrades() {
                     case 1:
                         nameOfType = "HalfYear";
                         break;
-                    default:
+                    case 2:
                         nameOfType = "EndYear";
                         break;
                 }
@@ -508,7 +554,7 @@ function renderGrades() {
                     case "HalfYear":
                         displayName = "Félévi jegyek";
                         break;
-                    default:
+                    case "EndYear":
                         displayName = "Évvégi jegyek";
                         break;
                 }
@@ -536,7 +582,7 @@ function renderGrades() {
                     case 1:
                         nameOfType = "HalfYear";
                         break;
-                    default:
+                    case 2:
                         nameOfType = "EndYear";
                         break;
                 }
@@ -549,7 +595,7 @@ function renderGrades() {
                     case "HalfYear":
                         displayName = "Félévi jegyek";
                         break;
-                    default:
+                    case "EndYear":
                         displayName = "Évvégi jegyek";
                         break;
                 }
@@ -564,40 +610,18 @@ function renderGrades() {
                 }
             }
 
-            M.Tabs.init(document.querySelectorAll(".tabs"), {});
-            /*
-            result['Evaluations'].forEach(function(element){
-                if(element['Form'] == "Mark" && element['Type'] == "MidYear"){
-                    var cardContainer = document.createElement("div");
-                    cardContainer.classList.add("col");
-                    cardContainer.classList.add("s12");
-                    cardContainer.classList.add("m4");
+            gradesTabs = M.Tabs.init(document.querySelectorAll(".tabs"), {});
 
-                    var card = document.createElement("div");
-                    card.classList.add("card");
-
-                    var cardContent = document.createElement("div");
-                    cardContent.classList.add("card-content");
-                    cardContent.innerHTML = element['Subject'];
-
-                    var cardTitle = document.createElement("div");
-                    cardTitle.classList.add("card-title");
-                    cardTitle.innerHTML = element['NumberValue'];
-
-                    cardContent.appendChild(cardTitle);
-                    card.appendChild(cardContent);
-                    cardContainer.appendChild(card);
-                    document.getElementById("jegyek").appendChild(cardContainer);
-                }
-            });*/
             M.Collapsible.init(document.querySelectorAll(".collapsible"), {});
             isJegyeimLoadedOnce = true;
         });
     }
 }
 
-function renderMidYearGrades(row) {
-    var nameOfType = "MidYear";
+// JEGYEK BEÍRÁS SORRENDJÉBEN
+function renderMidYearDateGrades(row){
+    // Rendezés beírás ideje alapján
+    var nameOfType = "MidYearDate";
     var typeContainer = document.createElement("div");
     typeContainer.classList.add("col");
     typeContainer.classList.add("s12");
@@ -608,32 +632,86 @@ function renderMidYearGrades(row) {
 
     var collapsible = document.createElement("ul");
     collapsible.classList.add("collapsible");
+    collapsible.id = "MidYearDate";
+
+    collapsible.style.display = "none";
 
     for (var j = 0; j < jegyek[nameOfType].length; j++) {
-        //console.log(jegyek[nameOfType][j]["name"]);
-        /*
-        var subject = document.createElement("div");
-        subject.classList.add("flow-text");
-        subject.classList.add("col");
-        subject.classList.add("s12");
-        subject.classList.add("white-text");
-        subject.innerHTML = `${jegyek["MidYear"][j]["name"]} – ${jegyek["MidYear"][j]["avg"]}`;
-        //typeContainer.innerHTML += `<b><div class="flow-text col s12 white-text">${jegyek[nameOfType][j]["name"]}</div></b>`;
-        container.appendChild(subject);
-        typeContainer.appendChild(container);
-        */
-        /*
-            <ul class="collapsible">
-                <li>
-                    <div class="collapsible-header">1111. 11. 11.</div>
-                    <div class="collapsible-body">
-                        <ul class="collection">
-                            <li class="collection-item">Tanóra</li>
-                        </ul>
-                    </div>
-                </li>
-            </ul>
-            */
+        var collLi = document.createElement("li");
+
+        var header = document.createElement("div");
+        header.classList.add("collapsible-header");
+        header.innerHTML = `${jegyek[nameOfType][j]['date'].split("T")[0].split("-")[0]}. ${jegyek[nameOfType][j]['date'].split("T")[0].split("-")[1]}. ${jegyek[nameOfType][j]['date'].split("T")[0].split("-")[2]}. - ${jegyek[nameOfType][j]['grades'].length} db értékelés`;
+
+        var body = document.createElement("div");
+        body.classList.add("collapsible-body");
+
+        var ul = document.createElement("ul");
+        ul.classList.add("collection");
+
+        for (var k = 0; k < jegyek[nameOfType][j]['grades'].length; k++) {
+            var currentGrade = jegyek[nameOfType][j]['grades'][k];
+
+            var cardLink = document.createElement("a");
+            cardLink.classList.add("modal-trigger");
+            cardLink.href = `#Grade-${currentGrade['Id']}`;
+
+            var li = document.createElement("li");
+            li.classList.add("collection-item");
+            li.innerHTML = `${currentGrade['Subject']} - ${currentGrade['Value']}`;
+
+            cardLink.appendChild(li);
+            ul.appendChild(cardLink);
+
+            M.Modal.init(document.querySelectorAll(`#Grade-${jegyek[nameOfType][j]['grades'][k]['Id']}`), {});
+        }
+        body.appendChild(ul);
+        collLi.appendChild(header);
+        collLi.appendChild(body);
+        collapsible.appendChild(collLi);
+    }
+    container.appendChild(collapsible);
+    document.getElementById("MidYear").appendChild(container);
+    M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
+}
+
+function showMidYear(){
+    document.getElementById("MidYearABC").style.display = "block";
+    document.getElementById("MidYearDate").style.display = "none";
+}
+
+function showMidYearDate(){
+    document.getElementById("MidYearABC").style.display = "none";
+    document.getElementById("MidYearDate").style.display = "block";
+}
+
+// FÉLÉVI JEGYEK ABC SORRENDBEN
+function renderMidYearGrades(row) {
+    var nameOfType = "MidYear";
+    var typeContainer = document.createElement("div");
+    typeContainer.classList.add("col");
+    typeContainer.classList.add("s12");
+    typeContainer.id = nameOfType;
+
+    var container = document.createElement("div");
+    container.classList.add("container");
+
+    container.innerHTML += `
+    <div class="row" style="margin-top:20px;">
+        <span class="flow-text white-text" style="margin-left:10px;">Évközi értékelések</span>
+        <a class='dropdown-trigger btn-flat waves-effect waves-grey white-text right' href='#' data-target='dropdown1'><i class="material-icons">sort</i>Rendezés</a>
+    </div>
+    <ul id='dropdown1' class='dropdown-content'>
+        <li><a href="#" id="MidYearBtn">Tantárgy</a></li>
+        <li><a href="#" id="MidYearDateBtn">Értékelés ideje</a></li>
+    </ul>
+    `;
+
+    var collapsible = document.createElement("ul");
+    collapsible.classList.add("collapsible");
+    collapsible.id = "MidYearABC";
+
+    for (var j = 0; j < jegyek[nameOfType].length; j++) {
         var collLi = document.createElement("li");
 
         var header = document.createElement("div");
@@ -750,6 +828,10 @@ function renderMidYearGrades(row) {
     container.appendChild(collapsible);
     typeContainer.appendChild(container);
     row.appendChild(typeContainer);
+    M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
+    renderMidYearDateGrades(row);
+    document.getElementById("MidYearBtn").addEventListener("click", showMidYear);
+    document.getElementById("MidYearDateBtn").addEventListener("click", showMidYearDate);
 }
 
 function renderSpecialGrades(nameOfType, displayName, row) {
@@ -1034,6 +1116,13 @@ function renderAbsences() {
                 </li>
             </ul>
             */
+
+           hianyzasok.sort(function (a, b) {
+                if (a.Date < b.Date) { return 1; }
+                if (a.Date > b.Date) { return -1; }
+                return 0;
+            });
+
             var ul = document.createElement("ul");
             ul.classList.add("collapsible");
             hianyzasok.forEach(function (element) {

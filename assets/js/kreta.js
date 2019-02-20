@@ -43,8 +43,6 @@ function refreshToken(refresh_token, institute_code){
 }
 
 function getApiLinks(){
-    var toReturn = "";
-
     var options = {
         url: 'http://kretamobile.blob.core.windows.net/configuration/ConfigurationDescriptor.json'
     };

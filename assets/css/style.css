@@ -84,3 +84,10 @@ input {
 .dropdown-content li>span {
     color: rgba(0,0,0,0.87) !important;
 }
+.dropdown-content li>a, .dropdown-content li>span {
+    color:  rgba(0,0,0,0.87) !important;
+}
+
+#jegyek .row{
+    margin-right: 0 !important;
+}
