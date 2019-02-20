@@ -973,11 +973,7 @@ function renderTimetable(positionInTime) {
         var endDay = new Date(startDay.addDays(4));
         document.getElementById("timetableDate").innerHTML = `${startDay.getFullYear()}. ${startDay.getMonth() + 1}. ${startDay.getDate()}. - ${endDay.getFullYear()}. ${endDay.getMonth() + 1}. ${endDay.getDate()}.`;
 
-        loadTimetable().then(function (result) {
-            if(!startupTimetableLoad){
-                startupTimetableLoad = true;
-                timetableCurrentLoad();
-            }
+        kreta.getTimetable(loginDatas['access_token'], loginDatas['InstituteCode'], `${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function (result) {
             timetableDatas = [];
             result.forEach(function (element) {
                 var isThisContains = false;
