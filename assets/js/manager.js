@@ -465,7 +465,7 @@ function renderGrades() {
             result['Evaluations'].forEach(function (element) {
                 var isThisContains = false;
                 for (var i = 0; i < jegyek["MidYearDate"].length; i++) {
-                    if (jegyek["MidYearDate"][i]['date'] == element['Date']) {
+                    if (jegyek["MidYearDate"][i]['date'] == element['Date'] || element['Type'] != "MidYear") {
                         isThisContains = true;
                     }
                 }
@@ -480,7 +480,7 @@ function renderGrades() {
 
             result['Evaluations'].forEach(function (element) {
                 for (var i = 0; i < jegyek["MidYearDate"].length; i++) {
-                    if (jegyek["MidYearDate"][i]['date'] == element['Date']) {
+                    if (jegyek["MidYearDate"][i]['date'] == element['Date'] && element['Type'] == "MidYear") {
                         var jegy = {
                             "Id": element['EvaluationId'],
                             "Subject": element['Subject'],
