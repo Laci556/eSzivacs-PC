@@ -21,7 +21,6 @@ function createWindow() {
         icon: path.join(__dirname, 'assets/img/icon.png')
     })
 
-    
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'assets', 'index.ejs'),
         protocol: 'file:',
@@ -57,7 +56,7 @@ app.on('ready', createWindow)
 app.on('window-all-closed', function () {
     // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
+    if (process.platform !== 'darwin' && !globals.isTrayEnabled()) {
         app.quit()
     }
 })

@@ -1,3 +1,10 @@
+<!-- Dropdown Structure -->
+<ul id="user" class="dropdown-content">
+    <li class="updateMyDatas"><a href="#!">Adatok frissítése</a></li>
+    <li class="divider"></li>
+    <li class="logout"><a href="#!">Kijelentkezés</a></li>
+</ul>
+
 <div id="navbar">
     <nav class="black" id="nav4real">
         <div class="nav-wrapper">
@@ -9,21 +16,22 @@
                     <li class="jegyek sidenav-close"><a href="#">Jegyeim</a></li>
                     <li class="hianyzasok sidenav-close"><a href="#">Hiányzásaim</a></li>
                     <li class="orarend sidenav-close"><a href="#">Órarend</a></li>
-                    <li class="updateMyDatas sidenav-close"><a href="#">Adatok frissítése</a></li>
-                    <li class="logout sidenav-close"><a href="#">Kijelentkezés</a></li>
+                    <li><a class="dropdown-trigger no-autoinit" href="#!" data-target="user"><span id="username">Név</span><i class="material-icons right">arrow_drop_down</i></a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <ul class="sidenav" id="mobile-demo">
-        <li><div class="user-view">
-            <div class="background grey darken-2">
+        <li>
+            <div class="user-view">
+                <div class="background grey darken-2">
+                </div>
+                <a href="#user"><img class="circle" src="./img/user.png"></a>
+                <a href="#name"><span id="name" class="white-text name">Név</span></a>
+                <a href="#email"><span id="school" class="white-text email">Iskola</span></a>
             </div>
-            <a href="#user"><img class="circle" src="./img/user.png"></a>
-            <a href="#name"><span id="name" class="white-text name">Név</span></a>
-            <a href="#email"><span id="school" class="white-text email">Iskola</span></a>
-        </div></li>
+        </li>
         <li class="fooldal sidenav-close"><a href="#">Főoldal</a></li>
         <li class="jegyek sidenav-close"><a href="#">Jegyeim</a></li>
         <li class="hianyzasok sidenav-close"><a href="#">Hiányzásaim</a></li>
