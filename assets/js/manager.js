@@ -7,31 +7,6 @@ require('../renderer.js');
 
 M.AutoInit();
 
-const {remote} = require('electron')
-const {Tray, Menu} = remote
-const globals = require('./js/globals');
-let trayIcon = new Tray(`C:/Users/pepyta/Documents/GitHub/eSzivacs-PC/assets/img/icon.png`);
-
-const version = globals.version();
-
-const trayMenuTemplate = [
-   {
-      label: `eSzivacs v${version}`,
-      enabled: false
-   },
-   
-   {
-      label: 'Bezárás',
-      click: function () {
-        const remote = require('electron').remote;
-        const window = remote.getCurrentWindow();
-        window.close();
-      }
-   }
-]
-
-let trayMenu = Menu.buildFromTemplate(trayMenuTemplate)
-trayIcon.setContextMenu(trayMenu)
 var currentUser;
 var instituteCode;
 var id;
