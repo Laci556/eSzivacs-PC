@@ -148,6 +148,10 @@ function orarendFunc() {
     showPage("orarend", true);
 }
 
+function openConsole(){
+    require('electron').remote.getCurrentWindow().webContents.openDevTools();
+}
+
 function showNavbar(toShow) {
     var showTitleBarLogo;
     var titleBarColor;
@@ -167,6 +171,7 @@ function showNavbar(toShow) {
         var orarendButtons = document.getElementsByClassName('orarend');
         var timetableBackButtons = document.getElementsByClassName('timetableBack');
         var timetableFwButtons = document.getElementsByClassName('timetableFw');
+        var consoleButtons = document.getElementsByClassName('console');
 
         loadUserDatas().then(function (result) {
             document.getElementById("name").innerHTML = result["Name"];
@@ -211,6 +216,11 @@ function showNavbar(toShow) {
         for (var i = 0; i < timetableFwButtons.length; i++) {
             (function (index) {
                 timetableFwButtons[index].addEventListener("click", timetableFw);
+            })(i);
+        }
+        for (var i = 0; i < consoleButtons.length; i++) {
+            (function (index) {
+                consoleButtons[index].addEventListener("click", openConsole);
             })(i);
         }
     } else {

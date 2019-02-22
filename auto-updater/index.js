@@ -45,8 +45,8 @@ function init(mainWindow) {
   })
 
   autoUpdater.once('update-downloaded', (ev, err) => {
-    const msg = '<p style="margin: 0;">🤘 Update downloaded - <a onclick="quitAndInstall()">Restart</a></p>'
-    mainWindow.webContents.send('console',  '<p style="margin: 0;">🤘 Update downloaded - <a onclick="quitAndInstall()">Restart</a></p>')
+    mainWindow.webContents.send('console', 'Update installed and ready to restart!')
+    mainWindow.webContents.send('modal');
   })
 
   autoUpdater.checkForUpdates()
