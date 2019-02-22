@@ -3,6 +3,8 @@ const fs = require('fs');
 const app2 = require('electron').remote.app;
 const file = require('./js/file');
 
+require('../renderer.js');
+
 M.AutoInit();
 
 const {remote} = require('electron')
@@ -56,12 +58,15 @@ function getSchools(){
     return new Promise(function(resolve, reject){
         file.getGlobal("schools").then(function(result, err){
             if(err) reject(err);
-            if(result != "") resolve(result);
-            updateSchools().then(function(){
-                getSchools().then(function(result){
-                    resolve(result);
-                });
-            })
+            if(result != ""){
+                resolve(result);
+            } else {
+                updateSchools().then(function(){
+                    getSchools().then(function(result2){
+                        resolve(result2);
+                    });
+                })
+            }
         });
     });
 }
@@ -126,7 +131,7 @@ function updateMyDatas(){
         if(result == "done"){
             // resetPages();
             // showPage(currentPage, true);
-            window.reload();
+            location.reload(); 
             M.toast({html:"Sikeresen frissítetted az adataidat!"});
         }
     }, function(err){
@@ -280,34 +285,36 @@ function saveLoginDatas(user, id, instituteCode){
     file.save(`${id}-${instituteCode}`, "login", user);
 }
 
-function saveTimetable(user) {
-    var json = JSON.stringify(user);
-    function callback() {
-        console.log("Successfully updated timetable.json!");
-    }
-    fs.writeFile(`${app2.getPath('userData')}/timetable.json`, json, 'utf8', callback);
-}
-
+var triesToUpdateTimetable = 0;
 function updateTimetable(startDate, endDate) {
-    return new Promise(function (resolve, reject) {
-        file.get(currentUser, "login").then(function(result){
-            kreta.getTimetable(result["access_token"], result["InstituteCode"], startDate, endDate).then(function (result2) {
-                console.log(`${startDate} -- ${endDate} `);
-                saveTimetable(result);
-                resolve(result);
-            }, function () {
-                kreta.refreshToken(result['refresh_token'], result['InstituteCode']).then(function (result) {
-                    saveLoginDatas(result2, result['InstituteCode']);
-                    updateUserDatas();
-                }, function (err) {
+    triesToUpdateTimetable++;
+    if(triesToUpdateTimetable < 4){
+        return new Promise(function (resolve, reject) {
+            file.get(currentUser, "login").then(function(result){
+                kreta.getTimetable(result["access_token"], result["InstituteCode"], startDate, endDate).then(function (result2) {
+                    console.log(`${startDate} -- ${endDate} `);
+                    resolve(result);
+                }, function () {
                     // Hiba esetén újrapróbálkozás
-                    updateTimetable(startDate, endDate).then(function(result3){
-                        resolve(result3);
+                    kreta.refreshToken(result['refresh_token'], result['InstituteCode']).then(function (result2) {
+                        saveLoginDatas(result2, result['InstituteCode']);
+                        updateUserDatas().then(function(){
+                            updateTimetable(startDate, endDate).then(function(result){
+                                resolve(result);
+                            });
+                        });
                     });
                 });
             });
         });
-    });
+    } else {
+        document.getElementById("timetables").innerHTML = `<div class="card col s12 m6 offset-m3"><div class="card-content"><div class="card-title center-align">Hiba lépett fel!</div><div class="row"><div class="col s12 justify">Nem sikerült betölteni az órarendet harmadjára sem. A manuális újrapróbáláshoz kattints a gombra!</div><div class="row center"><a class="btn btn-flat waves-effect waves-grey" id="retryTimetable">Újrapróbálkozás</a></div></div></div></div>`;
+        document.getElementById("retryTimetable").addEventListener("click", function(startDate, endDate){
+            updateTimetable(startDate, endDate).then(function(result){
+                resolve(result);
+            })
+        });
+    }
 
 }
 
@@ -338,22 +345,6 @@ function updateUserDatas(){
             });
         });
     });
-}
-
-function saveUserDatas(data, callback) {
-    userDatas = data;
-    var json = JSON.stringify(data);
-    function callback() {
-        console.log("Successfully updated user.json!");
-        if(isFirstTime){
-            isFirstTime = false;
-            //location.reload();
-            M.toast({html: "Sikeres bejelentkezés!"});
-        }
-    }
-    file.save(currentUser, "user", userDatas);
-    callback();
-    //fs.writeFile(`${app2.getPath('userData')}/user.json`, json, 'utf8', callback);
 }
 
 function loadUserDatas(){
@@ -929,95 +920,98 @@ function timetableFw() {
 
 function renderTimetable(positionInTime) {
     if (!isOrarendLoadedOnce) {
+        loadLoginDatas().then(function(result){
+            Date.prototype.addDays = function (days) {
+                var date = new Date(this.valueOf());
+                date.setDate(date.getDate() + days);
+                return date;
+            }
 
-        Date.prototype.addDays = function (days) {
-            var date = new Date(this.valueOf());
-            date.setDate(date.getDate() + days);
-            return date;
-        }
+            function getMonday(date) {
+                var day = date.getDay() || 7;
+                if (day !== 1)
+                    date.setHours(-24 * (day - 1));
+                return date;
+            }
+            var today = new Date();
+            today.setDate(today.getDate() + (7 * positionInTime));
 
-        function getMonday(date) {
-            var day = date.getDay() || 7;
-            if (day !== 1)
-                date.setHours(-24 * (day - 1));
-            return date;
-        }
-        var today = new Date();
-        today.setDate(today.getDate() + (7 * positionInTime));
-
-        var startDay = getMonday(today);
-        var endDay = new Date(startDay.addDays(4));
-        document.getElementById("timetableDate").innerHTML = `${startDay.getFullYear()}. ${startDay.getMonth() + 1}. ${startDay.getDate()}. - ${endDay.getFullYear()}. ${endDay.getMonth() + 1}. ${endDay.getDate()}.`;
-
-        kreta.getTimetable(loginDatas['access_token'], loginDatas['InstituteCode'], `${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function (result) {
-            timetableDatas = [];
-            result.forEach(function (element) {
-                var isThisContains = false;
-                for (var i = 0; i < timetableDatas.length; i++) {
-                    if (timetableDatas[i]['Date'] == element['Date']) {
-                        isThisContains = true;
+            var startDay = getMonday(today);
+            var endDay = new Date(startDay.addDays(4));
+            document.getElementById("timetableDate").innerHTML = `${startDay.getFullYear()}. ${startDay.getMonth() + 1}. ${startDay.getDate()}. - ${endDay.getFullYear()}. ${endDay.getMonth() + 1}. ${endDay.getDate()}.`;
+            console.log(`${result['access_token']}, ${result['InstituteCode']}, ${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}, ${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`);
+            kreta.getTimetable(result['access_token'], result['InstituteCode'], `${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function (result) {
+                timetableDatas = [];
+                result.forEach(function (element) {
+                    var isThisContains = false;
+                    for (var i = 0; i < timetableDatas.length; i++) {
+                        if (timetableDatas[i]['Date'] == element['Date']) {
+                            isThisContains = true;
+                        }
                     }
-                }
-                if (!isThisContains) {
-                    var day = {
-                        "Date": element['Date'],
-                        "Classes": []
-                    };
-                    timetableDatas.push(day);
-                }
-            });
-
-            result.forEach(function (element) {
-                for (var i = 0; i < timetableDatas.length; i++) {
-                    if (timetableDatas[i]['Date'] == element['Date']) {
-                        timetableDatas[i]['Classes'].push(element);
+                    if (!isThisContains) {
+                        var day = {
+                            "Date": element['Date'],
+                            "Classes": []
+                        };
+                        timetableDatas.push(day);
                     }
-                }
-            });
+                });
 
-            timetableDatas.forEach(function (element) {
-                var toAppend = new Date(element['Date']).getDay();
+                result.forEach(function (element) {
+                    for (var i = 0; i < timetableDatas.length; i++) {
+                        if (timetableDatas[i]['Date'] == element['Date']) {
+                            timetableDatas[i]['Classes'].push(element);
+                        }
+                    }
+                });
 
-                element['Classes'].forEach(function (ora) {
-                    var li = document.createElement("li");
-                    li.innerHTML = `
-                        <div class="collapsible-header"><span class="col s12">${ora['Subject']} <span
-                                    class="right">${ora['CalendarOraType'] == "UresOra" ? `<span class="red-text">${ora['StateName']}</span>` : ora['DeputyTeacher'] == "" ? ora['ClassRoom'] : `<span class="red-text">${ora['Teacher']}</span>`}</span></span></div>
-                        <div class="collapsible-body">
-                            <table>
-                                <tr>
-                                    <td><b>Tanár neve</b></td>
-                                    <td>${ora['Teacher']}</td>
-                                </tr>
-                                <tr>
-                                    <td><b>Tanterem</b></td>
-                                    <td>${ora['ClassRoom']}</td>
-                                </tr>
-                                <tr>
-                                    <td><b>Tanóra óraszáma</b></td>
-                                    <td>${ora['Count']}.</td>
-                                </tr>
-                                <tr>
-                                    <td><b>Témája</b></td>
-                                    <td>${ora['Theme']}</td>
-                                </tr>
-                                <tr>
-                                    <td><b>Időtartam</b></td>
-                                    <td>${ora['StartTime'].split("T")[1].split(":")[0]}:${ora['StartTime'].split("T")[1].split(":")[1]}-${ora['EndTime'].split("T")[1].split(":")[0]}:${ora['EndTime'].split("T")[1].split(":")[1]}</td>
-                                </tr>
-                            </table>
-    
-                        </div>`;
-                    document.getElementById(`classes-${toAppend}`).appendChild(li);
+                timetableDatas.forEach(function (element) {
+                    var toAppend = new Date(element['Date']).getDay();
+
+                    element['Classes'].forEach(function (ora) {
+                        var li = document.createElement("li");
+                        li.innerHTML = `
+                            <div class="collapsible-header"><span class="col s12">${ora['Subject']} <span
+                                        class="right">${ora['CalendarOraType'] == "UresOra" ? `<span class="red-text">${ora['StateName']}</span>` : ora['DeputyTeacher'] == "" ? ora['ClassRoom'] : `<span class="red-text">${ora['Teacher']}</span>`}</span></span></div>
+                            <div class="collapsible-body">
+                                <table>
+                                    <tr>
+                                        <td><b>Tanár neve</b></td>
+                                        <td>${ora['Teacher']}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Tanterem</b></td>
+                                        <td>${ora['ClassRoom']}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Tanóra óraszáma</b></td>
+                                        <td>${ora['Count']}.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Témája</b></td>
+                                        <td>${ora['Theme']}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Időtartam</b></td>
+                                        <td>${ora['StartTime'].split("T")[1].split(":")[0]}:${ora['StartTime'].split("T")[1].split(":")[1]}-${ora['EndTime'].split("T")[1].split(":")[0]}:${ora['EndTime'].split("T")[1].split(":")[1]}</td>
+                                    </tr>
+                                </table>
+        
+                            </div>`;
+                        document.getElementById(`classes-${toAppend}`).appendChild(li);
+                    });
                 });
             });
-        });
-        M.Tabs.init(document.querySelectorAll(".tabs"), {});
-        /*updateTimetable(`${startDay.getFullYear()}-${startDay.getMonth()+1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function(result){
-            timetableDatas = result;
-        });*/
 
-        isOrarendLoadedOnce = true;
+            M.Tabs.init(document.querySelectorAll(".tabs"), {});
+            /*updateTimetable(`${startDay.getFullYear()}-${startDay.getMonth()+1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function(result){
+                timetableDatas = result;
+            });*/
+
+            isOrarendLoadedOnce = true;
+            
+        });
     }
 }
 
@@ -1119,14 +1113,14 @@ document.querySelector("#login").addEventListener("submit", function (e) {
         });
     
 
-        kreta.loginUser(instituteCode, document.getElementById("username").value, document.getElementById("password").value).then(function (result) {
+        kreta.loginUser(instituteCode, document.getElementById("usernameInput").value, document.getElementById("password").value).then(function (result) {
             // Handling successful login
             // Storing school inside user.json
             //result["InstituteCode"] = document.getElementById("schools").value;
             // Some toast to make login look cool
             M.toast({ html: 'Sikeres bejelentkezés!' });
             // Save login datas
-            id = document.getElementById("username").value;
+            id = document.getElementById("usernameInput").value;
             
             file.getGlobal("users", []).then(function(result, err){
                 var data = result;
@@ -1148,7 +1142,7 @@ document.querySelector("#login").addEventListener("submit", function (e) {
             // Handling bad login datas (pretty fast tho)
             M.toast({ html: 'Rossz felhasználónév vagy jelszó!' })
         });
-        console.log(`${instituteCode}, ${document.getElementById("username").value}, ${document.getElementById("password").value}`);
+        console.log(`${instituteCode}, ${document.getElementById("usernameInput").value}, ${document.getElementById("password").value}`);
     });
     // Preventing from reloading page
     e.preventDefault();

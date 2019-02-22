@@ -6,7 +6,7 @@ html {
 body {
 	padding: 0px;
 	margin: 0px;
-	background-color: #2D2D30;
+	background-color: #212121;
 	position: absolute;
 	top: 0px;
 	left: 0px;
@@ -50,14 +50,14 @@ body {
 }
 
 #title-bar-btns button:hover {
-	background-color: #3F3F41;
+	background-color: #212121;
 }
 
 #content {
 	padding: 12px;	
 	color: #CCCCCC;
 }
-
+/*
 ::-webkit-scrollbar {
 	width: 6px;
   }
@@ -68,9 +68,9 @@ body {
    
   ::-webkit-scrollbar-thumb {
 	background: #000; 
-	border-radius: 10px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
 	background: #000; 
-  }
+	}
+	*/
