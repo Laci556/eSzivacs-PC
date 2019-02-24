@@ -41,15 +41,15 @@ function showMessage(message, hide = true, replaceAll = false) {
 }
 */
 
-function showMessage(message, hide = true, replaceAll = false) {
+function showMessage (message, hide = true, replaceAll = false) {
   M.toast({
     html: msg,
     displayLength: 2147483647
   })
 }
 
-function showModal() {
-  document.querySelector("body").innerHTML += `  <div id="updateAvailable" class="modal">
+function showModal () {
+  document.querySelector('body').innerHTML += `  <div id="updateAvailable" class="modal">
   <div class="modal-content center-align">
     <h4>Új frissítés érhető el!</h4>
     <div class="modal-footer">
@@ -57,9 +57,9 @@ function showModal() {
       <a href="#!" class="modal-close waves-effect waves-grey btn-flat" id="quitAndInstall">Telepítés</a>
     </div>
   </div>
-</div>`;
-  document.getElementById("quitAndInstall").addEventListener("click", quitAndInstall);
-  var elem = document.getElementById("updateAvailable");
-  var instance = M.Modal.init(elem, {});
-  instance.open();
+</div>`
+  document.getElementById('quitAndInstall').addEventListener('click', quitAndInstall)
+  var elem = document.getElementById('updateAvailable')
+  var instance = M.Modal.init(elem, {})
+  instance.open()
 }

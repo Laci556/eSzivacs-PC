@@ -1,9 +1,11 @@
 {
   "name": "eszivacs-pc",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Egy non-profit kliens a Kréta rendszerhez, diákoknak.",
   "main": "main.js",
   "scripts": {
+    "standard": "standard",
+    "standard::fix": "standard --fix",
     "start": "electron .",
     "cilinux": "electron-builder --linux --win",
     "cidarwin": "electron-builder --mac",
@@ -20,11 +22,12 @@
   "author": "Gál Péter (pepyta)",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^4.0.2",
     "cross-env": "^5.2.0",
+    "electron": "^4.0.2",
     "electron-builder": "^20.38.5",
     "electron-builder-squirrel-windows": "^19.16.0",
-    "electron-installer-squirrel-windows": "^1.3.0"
+    "electron-installer-squirrel-windows": "^1.3.0",
+    "standard": "^12.0.1"
   },
   "build": {
     "appId": "eszivacspc",
@@ -71,6 +74,7 @@
   },
   "dependencies": {
     "async": "^2.6.1",
+    "auto-launch": "^5.0.5",
     "ejs": "^2.6.1",
     "ejs-electron": "^2.0.3",
     "electron-builder-lib": "^20.23.1",
