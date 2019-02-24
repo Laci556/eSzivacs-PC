@@ -29,15 +29,15 @@ var positionInTime = 0;
 var isFirstTime = true;
 var currentPage;
 
-function getSchools(){
-    return new Promise(function(resolve, reject){
-        file.getGlobal("schools").then(function(result, err){
-            if(err) reject(err);
-            if(result != ""){
+function getSchools() {
+    return new Promise(function (resolve, reject) {
+        file.getGlobal("schools").then(function (result, err) {
+            if (err) reject(err);
+            if (result != "") {
                 resolve(result);
             } else {
-                updateSchools().then(function(){
-                    getSchools().then(function(result2){
+                updateSchools().then(function () {
+                    getSchools().then(function (result2) {
                         resolve(result2);
                     });
                 })
@@ -46,11 +46,11 @@ function getSchools(){
     });
 }
 
-function updateSchools(){
-    return new Promise(function(resolve, reject){
+function updateSchools() {
+    return new Promise(function (resolve, reject) {
         kreta.getSchools().then(function (result, err) {
-            if(err) reject(err);
-            file.saveGlobal("schools", result).then(function(){
+            if (err) reject(err);
+            file.saveGlobal("schools", result).then(function () {
                 resolve("");
             });
         });
@@ -67,7 +67,7 @@ function showPage(page, hideEveryThing) {
     }
     currentPage = page;
     document.getElementById(page).style.display = "block";
-    loadUserDatas().then(function(result){
+    loadUserDatas().then(function (result) {
         document.getElementById("username").innerHTML = result["Name"];
     })
     if (page == "login") {
@@ -94,27 +94,27 @@ function logout() {
     initAutoCompleteForLoginSchools();
 }
 
-function resetPages(){
+function resetPages() {
     isFooldalLoadedOnce = false;
     isHianyzasokLoadedOnce = false;
     isJegyeimLoadedOnce = false;
     isOrarendLoadedOnce = false;
 }
 
-function updateMyDatas(){
-    updateUserDatas().then(function(result){
-        if(result == "done"){
+function updateMyDatas() {
+    updateUserDatas().then(function (result) {
+        if (result == "done") {
             // resetPages();
             // showPage(currentPage, true);
-            location.reload(); 
-            M.toast({html:"Sikeresen frissítetted az adataidat!"});
+            location.reload();
+            M.toast({ html: "Sikeresen frissítetted az adataidat!" });
         }
-    }, function(err){
+    }, function (err) {
         showPage("login", true);
     });
 }
 
-function initAutoCompleteForLoginSchools(){
+function initAutoCompleteForLoginSchools() {
     getSchools().then(function (result) {
         var elems = document.querySelectorAll('#schools');
         var data = {};
@@ -148,7 +148,7 @@ function orarendFunc() {
     showPage("orarend", true);
 }
 
-function openConsole(){
+function openConsole() {
     require('electron').remote.getCurrentWindow().webContents.openDevTools();
 }
 
@@ -158,7 +158,7 @@ function showNavbar(toShow) {
     var showNavBar;
 
     if (toShow) {
-        M.Dropdown.init(document.querySelector(".dropdown-trigger", {alignment: "bottom", constrainWidth: false}));
+        M.Dropdown.init(document.querySelector(".dropdown-trigger", { alignment: "bottom", constrainWidth: false }));
 
         titleBarColor = "#000";
         showTitleBarLogo = "none";
@@ -239,19 +239,19 @@ function hidePage(page) {
     document.getElementById(page).style.display = "none";
 }
 
-function loadLoginDatas(){
-    return new Promise(function(resolve, reject){
-        file.getGlobal("users").then(function(result){
-            if(result == undefined){
+function loadLoginDatas() {
+    return new Promise(function (resolve, reject) {
+        file.getGlobal("users").then(function (result) {
+            if (result == undefined) {
                 resolve(undefined);
             }
-            if(result.length > 0){
-                for(var i = 0; i < result.length; i++){
-                    if(result[i]['Selected']){
+            if (result.length > 0) {
+                for (var i = 0; i < result.length; i++) {
+                    if (result[i]['Selected']) {
                         id = result[i]['Id'];
                         currentUser = `${result[i]['Id']}-${result[i]['InstituteCode']}`;
-                        file.get(currentUser, "login").then(function(result, err){
-                            if(err) reject(err);
+                        file.get(currentUser, "login").then(function (result, err) {
+                            if (err) reject(err);
                             console.log(result);
                             resolve(result);
                         });
@@ -265,7 +265,7 @@ function loadLoginDatas(){
     });
 }
 
-function saveLoginDatas(user, id, instituteCode){
+function saveLoginDatas(user, id, instituteCode) {
     user['InstituteCode'] = instituteCode;
     file.save(`${id}-${instituteCode}`, "login", user);
 }
@@ -273,9 +273,9 @@ function saveLoginDatas(user, id, instituteCode){
 var triesToUpdateTimetable = 0;
 function updateTimetable(startDate, endDate) {
     triesToUpdateTimetable++;
-    if(triesToUpdateTimetable < 4){
+    if (triesToUpdateTimetable < 4) {
         return new Promise(function (resolve, reject) {
-            file.get(currentUser, "login").then(function(result){
+            file.get(currentUser, "login").then(function (result) {
                 kreta.getTimetable(result["access_token"], result["InstituteCode"], startDate, endDate).then(function (result2) {
                     console.log(`${startDate} -- ${endDate} `);
                     resolve(result);
@@ -283,8 +283,8 @@ function updateTimetable(startDate, endDate) {
                     // Hiba esetén újrapróbálkozás
                     kreta.refreshToken(result['refresh_token'], result['InstituteCode']).then(function (result2) {
                         saveLoginDatas(result2, result['InstituteCode']);
-                        updateUserDatas().then(function(){
-                            updateTimetable(startDate, endDate).then(function(result){
+                        updateUserDatas().then(function () {
+                            updateTimetable(startDate, endDate).then(function (result) {
                                 resolve(result);
                             });
                         });
@@ -294,8 +294,8 @@ function updateTimetable(startDate, endDate) {
         });
     } else {
         document.getElementById("timetables").innerHTML = `<div class="card col s12 m6 offset-m3"><div class="card-content"><div class="card-title center-align">Hiba lépett fel!</div><div class="row"><div class="col s12 justify">Nem sikerült betölteni az órarendet harmadjára sem. A manuális újrapróbáláshoz kattints a gombra!</div><div class="row center"><a class="btn btn-flat waves-effect waves-grey" id="retryTimetable">Újrapróbálkozás</a></div></div></div></div>`;
-        document.getElementById("retryTimetable").addEventListener("click", function(startDate, endDate){
-            updateTimetable(startDate, endDate).then(function(result){
+        document.getElementById("retryTimetable").addEventListener("click", function (startDate, endDate) {
+            updateTimetable(startDate, endDate).then(function (result) {
                 resolve(result);
             })
         });
@@ -303,27 +303,40 @@ function updateTimetable(startDate, endDate) {
 
 }
 
-function updateUserDatas(){
-    return new Promise(function(resolve, reject){
-        file.get(currentUser, "login").then(function(result){
+// NEM MŰKÖDIK!!!
+function refreshToken() {
+    // Bejelentkezési tokenek frissítése automatikusan
+    file.get(currentUser, "login").then(function (result) {
+        setTimeout(function () {
+            kreta.refreshToken(result["refresh_token"], instituteCode).then(function (result) {
+                file.save(currentUser, "login", result);
+            });
+            refreshToken();
+        }, 3599);
+    });
+}
+
+function updateUserDatas() {
+    return new Promise(function (resolve, reject) {
+        file.get(currentUser, "login").then(function (result) {
             var instituteCode;
-            file.getGlobal("users").then(function(result2){
-                result2.forEach(function(element){
-                    if(element['Id'] == id){
+            file.getGlobal("users").then(function (result2) {
+                result2.forEach(function (element) {
+                    if (element['Id'] == id) {
                         instituteCode = element['InstituteCode'];
                     }
                 });
-                kreta.getUserDatas(result["access_token"], instituteCode, null, null).then(function(result2){
+                kreta.getUserDatas(result["access_token"], instituteCode, null, null).then(function (result2) {
                     file.save(currentUser, "user", result2);
                     resolve("done");
-                }, function(){
-                    kreta.refreshToken(result["access_token"], instituteCode).then(function(result2){
-                        file.save(currentUser, "user", result2);
-                        updateUserDatas().then(function(result3, err){
-                            if(err) reject(err);
+                }, function () {
+                    kreta.refreshToken(result["refresh_token"], instituteCode).then(function (result2) {
+                        file.save(currentUser, "login", result2);
+                        updateUserDatas().then(function (result3, err) {
+                            if (err) reject(err);
                             resolve(result3);
                         })
-                    }, function(){
+                    }, function () {
                         showPage("login", true);
                     });
                 });
@@ -332,21 +345,21 @@ function updateUserDatas(){
     });
 }
 
-function loadUserDatas(){
-    return new Promise(function(resolve, reject){
-        file.get(currentUser, "user").then(function(result, err){
-            if(err) reject(err);
+function loadUserDatas() {
+    return new Promise(function (resolve, reject) {
+        file.get(currentUser, "user").then(function (result, err) {
+            if (err) reject(err);
             console.log(result);
-            if(result != undefined){
+            if (result != undefined) {
                 console.log("From file");
                 resolve(result);
             } else {
-                updateUserDatas().then(function(err){
+                updateUserDatas().then(function (err) {
                     console.log("Updating...");
-                    if(err) reject(err);
-                    loadUserDatas().then(function(result2, err){
+                    if (err) reject(err);
+                    loadUserDatas().then(function (result2, err) {
                         console.log("Updated and value returned!");
-                        if(err) reject(err);
+                        if (err) reject(err);
                         // Valamiért nem olvassa ki első alkalommal, amikor még a fájlba is írunk, ezért csinálunk egy ilyen csúfságot
                         resolve(result2);
 
@@ -374,24 +387,24 @@ loadLoginDatas().then(function (result) {
 
 
 function renderFooldal() {
-        loadUserDatas().then(function (result) {
-            if (!isFooldalLoadedOnce) {
-                var gradesNumber = 0;
-                var strázsa = 0;
-                while (gradesNumber < 6) {
-                    if (result['Evaluations'][strázsa]['Type'] == "MidYear") {
-                        document.getElementById("fooldalGrades").innerHTML += `
+    loadUserDatas().then(function (result) {
+        if (!isFooldalLoadedOnce) {
+            var gradesNumber = 0;
+            var strázsa = 0;
+            while (gradesNumber < 6) {
+                if (result['Evaluations'][strázsa]['Type'] == "MidYear") {
+                    document.getElementById("fooldalGrades").innerHTML += `
                     <li class="collection-item">
                         <div>${result['Evaluations'][strázsa]['Subject']}<a href="#!" class="secondary-content">${result['Evaluations'][strázsa]['NumberValue'] > 0 ? result['Evaluations'][strázsa]['NumberValue'] : result['Evaluations'][strázsa]['Value']}</a></div>
                     </li>
                     `;
-                        gradesNumber++;
-                    }
-                    strázsa++;
+                    gradesNumber++;
                 }
-                isFirstNote = true;
-                result['Notes'].forEach(function (element) {
-                    document.getElementById("fooldalNotes").innerHTML += `
+                strázsa++;
+            }
+            isFirstNote = true;
+            result['Notes'].forEach(function (element) {
+                document.getElementById("fooldalNotes").innerHTML += `
                 <li>
                     <ul class="collapsible">
                         <li ${isFirstNote ? `class="active"` : ""}>
@@ -401,12 +414,12 @@ function renderFooldal() {
                     </ul>
                 </li>
                 `;
-                    isFirstNote = false;
-                });
-                M.Collapsible.init(document.querySelectorAll(".collapsible"), {});
-                isFooldalLoadedOnce = true;
-            }
-        });
+                isFirstNote = false;
+            });
+            M.Collapsible.init(document.querySelectorAll(".collapsible"), {});
+            isFooldalLoadedOnce = true;
+        }
+    });
 }
 
 function renderGrades() {
@@ -475,7 +488,7 @@ function renderGrades() {
                     }
                 }
             });
-            
+
             jegyek["MidYear"].forEach(function (element) {
                 result['SubjectAverages'].forEach(function (element2) {
                     if (element2['Subject'] == element['name']) {
@@ -638,7 +651,7 @@ function renderGrades() {
 }
 
 // JEGYEK BEÍRÁS SORRENDJÉBEN
-function renderMidYearDateGrades(row){
+function renderMidYearDateGrades(row) {
     // Rendezés beírás ideje alapján
     var nameOfType = "MidYearDate";
     var typeContainer = document.createElement("div");
@@ -694,12 +707,12 @@ function renderMidYearDateGrades(row){
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {});
 }
 
-function showMidYear(){
+function showMidYear() {
     document.getElementById("MidYearABC").style.display = "block";
     document.getElementById("MidYearDate").style.display = "none";
 }
 
-function showMidYearDate(){
+function showMidYearDate() {
     document.getElementById("MidYearABC").style.display = "none";
     document.getElementById("MidYearDate").style.display = "block";
 }
@@ -874,7 +887,7 @@ function timetableBack() {
     var endDay = new Date(startDay.addDays(4));
     for (var i = 1; i <= 5; i++) { document.getElementById("classes-" + i).innerHTML = ""; }
     isOrarendLoadedOnce = false;
-    updateTimetable(`${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function(result){
+    updateTimetable(`${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`).then(function (result) {
         renderTimetable(positionInTime);
     });
 }
@@ -898,14 +911,14 @@ function timetableFw() {
     var endDay = new Date(startDay.addDays(4));
     for (var i = 1; i <= 5; i++) { document.getElementById("classes-" + i).innerHTML = ""; }
     isOrarendLoadedOnce = false;
-    updateTimetable(`${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function(result){
+    updateTimetable(`${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`).then(function (result) {
         renderTimetable(positionInTime);
     });
 }
 
 function renderTimetable(positionInTime) {
     if (!isOrarendLoadedOnce) {
-        loadLoginDatas().then(function(result){
+        loadLoginDatas().then(function (result) {
             Date.prototype.addDays = function (days) {
                 var date = new Date(this.valueOf());
                 date.setDate(date.getDate() + days);
@@ -924,8 +937,8 @@ function renderTimetable(positionInTime) {
             var startDay = getMonday(today);
             var endDay = new Date(startDay.addDays(4));
             document.getElementById("timetableDate").innerHTML = `${startDay.getFullYear()}. ${startDay.getMonth() + 1}. ${startDay.getDate()}. - ${endDay.getFullYear()}. ${endDay.getMonth() + 1}. ${endDay.getDate()}.`;
-            console.log(`${result['access_token']}, ${result['InstituteCode']}, ${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}, ${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`);
-            kreta.getTimetable(result['access_token'], result['InstituteCode'], `${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function (result) {
+            console.log(`${result['access_token']}, ${result['InstituteCode']}, ${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}, ${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`);
+            kreta.getTimetable(result['access_token'], result['InstituteCode'], `${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`).then(function (result) {
                 timetableDatas = [];
                 result.forEach(function (element) {
                     var isThisContains = false;
@@ -995,7 +1008,7 @@ function renderTimetable(positionInTime) {
             });*/
 
             isOrarendLoadedOnce = true;
-            
+
         });
     }
 }
@@ -1041,7 +1054,7 @@ function renderAbsences() {
             </ul>
             */
 
-           hianyzasok.sort(function (a, b) {
+            hianyzasok.sort(function (a, b) {
                 if (a.Date < b.Date) { return 1; }
                 if (a.Date > b.Date) { return -1; }
                 return 0;
@@ -1090,13 +1103,13 @@ initAutoCompleteForLoginSchools();
 
 // Handle logging in
 document.querySelector("#login").addEventListener("submit", function (e) {
-    getSchools().then(function(result){
-        result.forEach(function(element){
-            if(element.Name == document.getElementById("schools").value){
+    getSchools().then(function (result) {
+        result.forEach(function (element) {
+            if (element.Name == document.getElementById("schools").value) {
                 instituteCode = element.InstituteCode;
             }
         });
-    
+
 
         kreta.loginUser(instituteCode, document.getElementById("usernameInput").value, document.getElementById("password").value).then(function (result) {
             // Handling successful login
@@ -1106,8 +1119,8 @@ document.querySelector("#login").addEventListener("submit", function (e) {
             M.toast({ html: 'Sikeres bejelentkezés!' });
             // Save login datas
             id = document.getElementById("usernameInput").value;
-            
-            file.getGlobal("users", []).then(function(result, err){
+
+            file.getGlobal("users", []).then(function (result, err) {
                 var data = result;
                 var user = {
                     "InstituteCode": instituteCode,

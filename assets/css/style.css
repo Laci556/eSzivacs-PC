@@ -91,3 +91,10 @@ input {
 #jegyek .row{
     margin-right: 0 !important;
 }
+
+.row .col.s-one-fifth {
+    width: 20%;
+    margin-left: auto;
+    left: auto;
+    right: auto;
+}
