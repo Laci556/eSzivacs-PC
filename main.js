@@ -5,7 +5,7 @@ const ejse = require('ejs-electron')
 const path = require('path')
 const url = require('url')
 const totray = require('./assets/js/totray');
-require('update-electron-app')()
+//require('update-electron-app')()
 const autoUpdater = require('./auto-updater')
 if (require('electron-squirrel-startup')) require('electron').app.quit()
 
