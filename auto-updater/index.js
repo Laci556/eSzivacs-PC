@@ -44,7 +44,7 @@ function init (mainWindow) {
     mainWindow.webContents.send('console', '👎 Update not available')
   })
 
-  autoUpdater.once('update-downloaded', (ev, err) => {
+  autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     mainWindow.webContents.send('console', 'Update installed and ready to restart!')
     mainWindow.webContents.send('modal')
   })

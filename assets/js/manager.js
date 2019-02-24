@@ -119,7 +119,7 @@ function updateMyDatas() {
   })
 }
 
-require('electron').remote.app.on('window-all-closed', function () {});
+require('electron').remote.app.on('window-all-closed', function () { });
 
 
 
@@ -425,14 +425,14 @@ function renderBeallitasok() {
 }
 
 function renderFooldal() {
-  updateUserDatas().then(function(){
+  updateUserDatas().then(function () {
     realRenderFooldal();
-  }, function(){
+  }, function () {
     realRenderFooldal();
   })
 }
 
-function realRenderFooldal(){
+function realRenderFooldal() {
   file.get(currentUser, "settings", {}).then(function (result) {
     if (result["notifications"]) {
       startNotificationListener();
@@ -985,39 +985,48 @@ function renderTimetable(positionInTime) {
       var startDay = getMonday(today)
       var endDay = new Date(startDay.addDays(4))
       document.getElementById('timetableDate').innerHTML = `${startDay.getFullYear()}. ${startDay.getMonth() + 1}. ${startDay.getDate()}. - ${endDay.getFullYear()}. ${endDay.getMonth() + 1}. ${endDay.getDate()}.`
-      console.log(`${result['access_token']}, ${result['InstituteCode']}, ${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}, ${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`)
-      kreta.getTimetable(result['access_token'], result['InstituteCode'], `${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`).then(function (result) {
-        timetableDatas = []
-        result.forEach(function (element) {
-          var isThisContains = false
-          for (var i = 0; i < timetableDatas.length; i++) {
-            if (timetableDatas[i]['Date'] == element['Date']) {
-              isThisContains = true
-            }
-          }
-          if (!isThisContains) {
-            var day = {
-              'Date': element['Date'],
-              'Classes': []
-            }
-            timetableDatas.push(day)
-          }
-        })
 
-        result.forEach(function (element) {
-          for (var i = 0; i < timetableDatas.length; i++) {
-            if (timetableDatas[i]['Date'] == element['Date']) {
-              timetableDatas[i]['Classes'].push(element)
-            }
+      file.getGlobal("users").then(function (users) {
+        var instituteCode;
+        users.forEach(function (user) {
+          if (user["Id"] == currentUser.split("-")[0]) {
+            instituteCode = user["InstituteCode"]
           }
-        })
+        });
+        console.log(instituteCode);
+        //console.log(`${result['access_token']}, ${result['InstituteCode']}, ${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}, ${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`)
+        kreta.getTimetable(result['access_token'], instituteCode, `${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`).then(function (result) {
+          timetableDatas = []
+          result.forEach(function (element) {
+            var isThisContains = false
+            for (var i = 0; i < timetableDatas.length; i++) {
+              if (timetableDatas[i]['Date'] == element['Date']) {
+                isThisContains = true
+              }
+            }
+            if (!isThisContains) {
+              var day = {
+                'Date': element['Date'],
+                'Classes': []
+              }
+              timetableDatas.push(day)
+            }
+          })
 
-        timetableDatas.forEach(function (element) {
-          var toAppend = new Date(element['Date']).getDay()
+          result.forEach(function (element) {
+            for (var i = 0; i < timetableDatas.length; i++) {
+              if (timetableDatas[i]['Date'] == element['Date']) {
+                timetableDatas[i]['Classes'].push(element)
+              }
+            }
+          })
 
-          element['Classes'].forEach(function (ora) {
-            var li = document.createElement('li')
-            li.innerHTML = `
+          timetableDatas.forEach(function (element) {
+            var toAppend = new Date(element['Date']).getDay()
+
+            element['Classes'].forEach(function (ora) {
+              var li = document.createElement('li')
+              li.innerHTML = `
                             <div class="collapsible-header"><span class="col s12">${ora['Subject']} <span
                                         class="right">${ora['CalendarOraType'] == 'UresOra' ? `<span class="red-text">${ora['StateName']}</span>` : ora['DeputyTeacher'] == '' ? ora['ClassRoom'] : `<span class="red-text">${ora['Teacher']}</span>`}</span></span></div>
                             <div class="collapsible-body">
@@ -1045,17 +1054,19 @@ function renderTimetable(positionInTime) {
                                 </table>
         
                             </div>`
-            document.getElementById(`classes-${toAppend}`).appendChild(li)
+              document.getElementById(`classes-${toAppend}`).appendChild(li)
+            })
           })
         })
+
+        M.Tabs.init(document.querySelectorAll('.tabs'), {})
+        /* updateTimetable(`${startDay.getFullYear()}-${startDay.getMonth()+1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function(result){
+                  timetableDatas = result;
+              }); */
+
+        isOrarendLoadedOnce = true
+
       })
-
-      M.Tabs.init(document.querySelectorAll('.tabs'), {})
-      /* updateTimetable(`${startDay.getFullYear()}-${startDay.getMonth()+1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function(result){
-                timetableDatas = result;
-            }); */
-
-      isOrarendLoadedOnce = true
     })
   }
 }
@@ -1271,7 +1282,7 @@ document.getElementById('notifications').addEventListener('input', function (evt
   })
 })
 
-document.getElementById('totray').addEventListener('input', function(evt){
+document.getElementById('totray').addEventListener('input', function (evt) {
   file.get(currentUser, 'settings', {}).then(function (result) {
     result['totray'] = document.getElementById('totray').checked
     file.saveGlobal('settings', result);
