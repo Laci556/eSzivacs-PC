@@ -1,4 +1,5 @@
 // Modules to control application life and create native browser window
+if (require('electron-squirrel-startup')) require('electron').app.quit()
 const { app, BrowserWindow } = require('electron')
 const ejs = require('ejs')
 const ejse = require('ejs-electron')
@@ -7,7 +8,6 @@ const url = require('url')
 const totray = require('./assets/js/totray');
 //require('update-electron-app')()
 const autoUpdater = require('./auto-updater')
-if (require('electron-squirrel-startup')) require('electron').app.quit()
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

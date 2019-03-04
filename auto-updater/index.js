@@ -11,7 +11,7 @@ const nutsURL = 'https://update.electronjs.org/pepyta/eSzivacs-PC/'
 if (os.platform() === 'darwin') {
   updateFeed = `${nutsURL}/update/darwin-x64/${appVersion}`
 } else if (os.platform() === 'win32') {
-  updateFeed = `https://update.electronjs.org/pepyta/eSzivacs-PC/${platform}/${appVersion}`
+  updateFeed = `${nutsURL}/${platform}/${appVersion}`
   // updateFeed = `${nutsURL}/update/${platform}/${appVersion}`
 }
 
@@ -47,6 +47,7 @@ function init (mainWindow) {
   autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     mainWindow.webContents.send('console', 'Update installed and ready to restart!')
     mainWindow.webContents.send('modal')
+    mainWindow.webContents.send('pushToMain')
   })
 
   autoUpdater.checkForUpdates()

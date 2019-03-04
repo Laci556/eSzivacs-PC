@@ -5,16 +5,12 @@ const file = require('./js/file')
 
 require('../renderer.js')
 
-require('materialize-css')
-
 M.AutoInit()
 
 var currentUser
 var instituteCode
 var id
-var schools
 var loginDatas
-var userDatas
 var isFooldalLoadedOnce = false
 var isJegyeimLoadedOnce = false
 var isHianyzasokLoadedOnce = false
@@ -28,18 +24,19 @@ var jegyek = {
 }
 var timetableDatas = []
 var positionInTime = 0
-var isFirstTime = true
-var currentPage
 
 function getSchools() {
   return new Promise(function (resolve, reject) {
     file.getGlobal('schools').then(function (result, err) {
       if (err) reject(err)
-      if (result != '') {
+      //M.toast({html: "Iskolák betöltése folyamatban..."})
+      if (result != undefined) {
+        //M.toast({html: "Sikeres betöltés: fájlból"})
         resolve(result)
       } else {
         updateSchools().then(function () {
           getSchools().then(function (result2) {
+            //M.toast({html: "Sikeres betöltés: letöltve az internetről"})
             resolve(result2)
           })
         })
@@ -120,8 +117,6 @@ function updateMyDatas() {
 }
 
 require('electron').remote.app.on('window-all-closed', function () { });
-
-
 
 function initAutoCompleteForLoginSchools() {
   getSchools().then(function (result) {
@@ -284,8 +279,13 @@ function loadLoginDatas() {
 }
 
 function saveLoginDatas(user, id, instituteCode) {
-  user['InstituteCode'] = instituteCode
-  file.save(`${id}-${instituteCode}`, 'login', user)
+  return new Promise(function (resolve, reject) {
+    user['InstituteCode'] = instituteCode
+    file.save(`${id}-${instituteCode}`, 'login', user).then(function (result, err) {
+      if (err) reject(err)
+      resolve(result)
+    })
+  })
 }
 
 var triesToUpdateTimetable = 0
@@ -300,10 +300,11 @@ function updateTimetable(startDate, endDate) {
         }, function () {
           // Hiba esetén újrapróbálkozás
           kreta.refreshToken(result['refresh_token'], result['InstituteCode']).then(function (result2) {
-            saveLoginDatas(result2, result['InstituteCode'])
-            updateUserDatas().then(function () {
-              updateTimetable(startDate, endDate).then(function (result) {
-                resolve(result)
+            saveLoginDatas(result2, result['InstituteCode']).then(function () {
+              updateUserDatas().then(function () {
+                updateTimetable(startDate, endDate).then(function (result) {
+                  resolve(result)
+                })
               })
             })
           })
@@ -335,6 +336,7 @@ function refreshToken() {
 
 function updateUserDatas() {
   return new Promise(function (resolve, reject) {
+    console.log(currentUser)
     file.get(currentUser, 'login').then(function (result) {
       var instituteCode
       file.getGlobal('users').then(function (result2) {
@@ -371,7 +373,7 @@ function loadUserDatas() {
         console.log('From file')
         resolve(result)
       } else {
-        updateUserDatas().then(function (err) {
+        updateUserDatas().then(function (result, err) {
           console.log('Updating...')
           if (err) reject(err)
           loadUserDatas().then(function (result2, err) {
@@ -379,8 +381,6 @@ function loadUserDatas() {
             if (err) reject(err)
             // Valamiért nem olvassa ki első alkalommal, amikor még a fájlba is írunk, ezért csinálunk egy ilyen csúfságot
             resolve(result2)
-
-            location.reload()
           })
         })
       }
@@ -425,12 +425,10 @@ function renderBeallitasok() {
 }
 
 function renderFooldal() {
-  updateUserDatas().then(function () {
-    realRenderFooldal();
-  }, function () {
-    realRenderFooldal();
-  })
+  realRenderFooldal()
 }
+
+initAutoCompleteForLoginSchools()
 
 function realRenderFooldal() {
   file.get(currentUser, "settings", {}).then(function (result) {
@@ -550,6 +548,7 @@ function renderGrades() {
         })
       })
 
+      var numValueQuantitiy = 0;
       result['Evaluations'].forEach(function (element) {
         for (var i = 0; i < jegyek[element['Type']].length; i++) {
           var subjectName = element['Subject']
@@ -578,7 +577,7 @@ function renderGrades() {
           }
         }
       })
-
+      
       jegyek['MidYear'].sort(function (a, b) {
         if (a.name < b.name) { return -1 }
         if (a.name > b.name) { return 1 }
@@ -747,7 +746,7 @@ function renderMidYearDateGrades(row) {
       cardLink.appendChild(li)
       ul.appendChild(cardLink)
 
-      M.Modal.init(document.querySelectorAll(`#Grade-${jegyek[nameOfType][j]['grades'][k]['Id']}`), {})
+      M.Modal.init(document.querySelector(`#Grade-${jegyek[nameOfType][j]['grades'][k]['Id']}`), {})
     }
     body.appendChild(ul)
     collLi.appendChild(header)
@@ -769,7 +768,7 @@ function showMidYearDate() {
   document.getElementById('MidYearDate').style.display = 'block'
 }
 
-// FÉLÉVI JEGYEK ABC SORRENDBEN
+// ÉVKÖZI JEGYEK ABC SORRENDBEN
 function renderMidYearGrades(row) {
   var nameOfType = 'MidYear'
   var typeContainer = document.createElement('div')
@@ -871,8 +870,7 @@ function renderMidYearGrades(row) {
       modal.appendChild(modalContent)
       document.getElementById('jegyek').appendChild(modal)
 
-      var elems = document.querySelectorAll(`#Grade-${jegyek[nameOfType][j]['grades'][k]['Id']}`)
-      var instances = M.Modal.init(elems, {})
+      M.Modal.init(document.querySelector(`#Grade-${jegyek[nameOfType][j]['grades'][k]['Id']}`), {})
     }
     body.appendChild(ul)
     collLi.appendChild(header)
@@ -905,6 +903,22 @@ function renderSpecialGrades(nameOfType, displayName, row) {
   header.classList.add('collection-header')
   header.innerHTML = `<h4>${displayName}</h4>`
   ul.appendChild(header)
+  if(nameOfType == "HalfYear"){
+    var li = document.createElement('li')
+    li.classList.add('collection-item')
+    var sum = 0;
+    var quantity = 0;
+    jegyek[nameOfType].forEach(function(element){
+      console.log(element)
+      console.log(element["grades"][0]["NumberValue"])
+      if(element["grades"][0]["NumberValue"] != undefined && element["grades"][0]["NumberValue"] != 0){
+        quantity++
+        sum += element["grades"][0]["NumberValue"]
+      }
+    })
+    li.innerHTML = `<div>Összes jegy átlaga: <a href="#" class="secondary-content">${parseFloat(Math.round(sum/quantity * 100) / 100).toFixed(2)}</p></div>`
+    ul.appendChild(li)
+  }
   for (var j = 0; j < jegyek[nameOfType].length; j++) {
     for (var k = 0; k < jegyek[nameOfType][j]['grades'].length; k++) {
       var li = document.createElement('li')
@@ -1144,8 +1158,6 @@ function renderAbsences() {
   }
 }
 
-initAutoCompleteForLoginSchools()
-
 // Handle logging in
 document.querySelector('#login').addEventListener('submit', function (e) {
   getSchools().then(function (result) {
@@ -1164,22 +1176,26 @@ document.querySelector('#login').addEventListener('submit', function (e) {
       // Save login datas
       id = document.getElementById('usernameInput').value
 
-      file.getGlobal('users', []).then(function (result, err) {
-        var data = result
+      currentUser = `${id}-${instituteCode}`
+      file.getGlobal('users', []).then(function (result2, err) {
+        var data = result2
         var user = {
           'InstituteCode': instituteCode,
           'Id': id,
           'Selected': true
         }
         data.push(user)
-        file.saveGlobal('users', data)
-      })
+        file.saveGlobal('users', data).then(function () {
+          console.log(result)
+          saveLoginDatas(result, id, instituteCode).then(function (result, err) {
+            // Show the main page
+            showPage('fooldal')
+            // Hide logging in
+            hidePage('login')
+          })
+        })
 
-      saveLoginDatas(result, id, instituteCode)
-      // Show the main page
-      showPage('fooldal')
-      // Hide logging in
-      hidePage('login')
+      })
     }, function () {
       // Handling bad login datas (pretty fast tho)
       M.toast({ html: 'Rossz felhasználónév vagy jelszó!' })
