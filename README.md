@@ -17,7 +17,7 @@
 | Windows x64 (v1.3.0) | [`eSzivacs.exe`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.3.0/eSzivacs.exe) |
 
 ## Jellemzők
-- 🤖 Electron alapú felület
+- :electron: Electron alapú felület
 - 🗒️ Jegyek lekérdezése
 - 🌡️ Hiányzások lekérése
 - 📅 Órarend megtekintése
