@@ -1,6 +1,6 @@
 <p align="center"><img src="assets/img/banner.png" width="60%"></p>
 
-[<p align="center"><img src="https://img.shields.io/travis/pepyta/eSzivacs-PC.svg?style=for-the-badge" alt="travis">](https://travis-ci.org/pepyta/eSzivacs-PC) [<img src="https://img.shields.io/github/downloads/pepyta/eSzivacs-PC/total.svg?style=for-the-badge" alt="downloads">](https://github.com/pepyta/eSzivacs-PC/releases) [![](https://img.shields.io/github/release/pepyta/eSzivacs-PC.svg?style=for-the-badge)](https://github.com/pepyta/eSzivacs-PC/releases/latest)</p>
+[<p align="center"><img src="https://img.shields.io/travis/pepyta/eSzivacs-PC.svg?style=for-the-badge" alt="travis">](https://travis-ci.org/pepyta/eSzivacs-PC) [<img src="https://img.shields.io/github/downloads/pepyta/eSzivacs-PC/total.svg?style=for-the-badge" alt="downloads">](https://github.com/pepyta/eSzivacs-PC/releases) [![](https://img.shields.io/github/release/Laci556/eSzivacs-PC.svg?style=for-the-badge)](https://github.com/Laci556/eSzivacs-PC/releases/latest)</p>
 
 ## Tartalom
 - [Jellemzők](#jellemzők)
@@ -16,6 +16,8 @@
 | -------- | --------------- |
 | Windows x64 (v1.4.0) | [`eSzivacs.exe`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.4.0/eSzivacs.exe) |
 | macOS (v1.4.0) | [`eSzivacs.dmg`](https://github.com/Laci556/eSzivacs-PC/releases/download/v1.4.0-macOS/eSzivacs.dmg) |
+| Windows x64 (v1.4.1) | [`eSzivacs.exe`](https://github.com/Laci556/eSzivacs-PC/releases/download/v1.4.1/eSzivacs.exe) |
+| macOS (v1.4.1) | [`eSzivacs.dmg`](https://github.com/Laci556/eSzivacs-PC/releases/download/v1.4.1/eSzivacs.dmg) |
 
 ## Jellemzők
 - :electron: Electron alapú felület
