@@ -996,6 +996,11 @@ function renderTimetable(positionInTime) {
 			var today = new Date()
 			today.setDate(today.getDate() + (7 * positionInTime))
 
+			// Open automatically today's timetable
+			document.getElementById(`orarend-${today.getDay()}`).classList.add("active")
+
+			console.log(`orarend-${today.getDay()}`)
+			
 			var startDay = getMonday(today)
 			var endDay = new Date(startDay.addDays(4))
 			document.getElementById('timetableDate').innerHTML = `${startDay.getFullYear()}. ${startDay.getMonth() + 1}. ${startDay.getDate()}. - ${endDay.getFullYear()}. ${endDay.getMonth() + 1}. ${endDay.getDate()}.`
@@ -1005,81 +1010,82 @@ function renderTimetable(positionInTime) {
 				users.forEach(function (user) {
 					if (user["Id"] == currentUser.split("-")[0]) {
 						instituteCode = user["InstituteCode"]
-					}
-				});
-				console.log(instituteCode);
-				//console.log(`${result['access_token']}, ${result['InstituteCode']}, ${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}, ${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`)
-				kreta.getTimetable(result['access_token'], instituteCode, `${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`).then(function (result) {
-					timetableDatas = []
-					result.forEach(function (element) {
-						var isThisContains = false
-						for (var i = 0; i < timetableDatas.length; i++) {
-							if (timetableDatas[i]['Date'] == element['Date']) {
-								isThisContains = true
-							}
-						}
-						if (!isThisContains) {
-							var day = {
-								'Date': element['Date'],
-								'Classes': []
-							}
-							timetableDatas.push(day)
-						}
-					})
+				
+						//console.log(`${result['access_token']}, ${result['InstituteCode']}, ${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}, ${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`)
+						kreta.getTimetable(result['access_token'], instituteCode, `${startDay.getFullYear()}-${startDay.getMonth() + 1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`).then(function (result) {
+							timetableDatas = []
+							result.forEach(function (element) {
+								var isThisContains = false
+								for (var i = 0; i < timetableDatas.length; i++) {
+									if (timetableDatas[i]['Date'] == element['Date']) {
+										isThisContains = true
+									}
+								}
+								if (!isThisContains) {
+									var day = {
+										'Date': element['Date'],
+										'Classes': []
+									}
+									timetableDatas.push(day)
+								}
+							})
 
-					result.forEach(function (element) {
-						for (var i = 0; i < timetableDatas.length; i++) {
-							if (timetableDatas[i]['Date'] == element['Date']) {
-								timetableDatas[i]['Classes'].push(element)
-							}
-						}
-					})
+							result.forEach(function (element) {
+								for (var i = 0; i < timetableDatas.length; i++) {
+									if (timetableDatas[i]['Date'] == element['Date']) {
+										timetableDatas[i]['Classes'].push(element)
+									}
+								}
+							})
 
-					timetableDatas.forEach(function (element) {
-						var toAppend = new Date(element['Date']).getDay()
+							timetableDatas.forEach(function (element) {
+								var toAppend = new Date(element['Date']).getDay()
 
-						element['Classes'].forEach(function (ora) {
-							var li = document.createElement('li')
-							li.innerHTML = `
-                            <div class="collapsible-header"><span class="col s12">${ora['Subject']} <span
-                                        class="right">${ora['CalendarOraType'] == 'UresOra' ? `<span class="red-text">${ora['StateName']}</span>` : ora['DeputyTeacher'] == '' ? ora['ClassRoom'] : `<span class="red-text">${ora['Teacher']}</span>`}</span></span></div>
-                            <div class="collapsible-body">
-                                <table>
-                                    <tr>
-                                        <td><b>Tanár neve</b></td>
-                                        <td>${ora['Teacher']}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><b>Tanterem</b></td>
-                                        <td>${ora['ClassRoom']}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><b>Tanóra óraszáma</b></td>
-                                        <td>${ora['Count']}.</td>
-                                    </tr>
-                                    <tr>
-                                        <td><b>Témája</b></td>
-                                        <td>${ora['Theme']}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><b>Időtartam</b></td>
-                                        <td>${ora['StartTime'].split('T')[1].split(':')[0]}:${ora['StartTime'].split('T')[1].split(':')[1]}-${ora['EndTime'].split('T')[1].split(':')[0]}:${ora['EndTime'].split('T')[1].split(':')[1]}</td>
-                                    </tr>
-                                </table>
-        
-                            </div>`
-							document.getElementById(`classes-${toAppend}`).appendChild(li)
+								element['Classes'].forEach(function (ora) {
+									var li = document.createElement('li')
+									li.innerHTML = `
+									<div class="collapsible-header"><span class="col s12">${ora['Subject']} <span
+												class="right">${ora['CalendarOraType'] == 'UresOra' ? `<span class="red-text">${ora['StateName']}</span>` : ora['DeputyTeacher'] == '' ? ora['ClassRoom'] : `<span class="red-text">${ora['Teacher']}</span>`}</span></span></div>
+									<div class="collapsible-body">
+										<table>
+											<tr>
+												<td><b>Tanár neve</b></td>
+												<td>${ora['Teacher']}</td>
+											</tr>
+											<tr>
+												<td><b>Tanterem</b></td>
+												<td>${ora['ClassRoom']}</td>
+											</tr>
+											<tr>
+												<td><b>Tanóra óraszáma</b></td>
+												<td>${ora['Count']}.</td>
+											</tr>
+											<tr>
+												<td><b>Témája</b></td>
+												<td>${ora['Theme']}</td>
+											</tr>
+											<tr>
+												<td><b>Időtartam</b></td>
+												<td>${ora['StartTime'].split('T')[1].split(':')[0]}:${ora['StartTime'].split('T')[1].split(':')[1]}-${ora['EndTime'].split('T')[1].split(':')[0]}:${ora['EndTime'].split('T')[1].split(':')[1]}</td>
+											</tr>
+										</table>
+				
+									</div>`
+									document.getElementById(`classes-${toAppend}`).appendChild(li)
+								})
+							})
 						})
-					})
+
+						M.Tabs.init(document.querySelectorAll('.tabs'), {})
+						/* updateTimetable(`${startDay.getFullYear()}-${startDay.getMonth()+1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function(result){
+								timetableDatas = result;
+							}); */
+
+						isOrarendLoadedOnce = true
+
+				
+					}
 				})
-
-				M.Tabs.init(document.querySelectorAll('.tabs'), {})
-				/* updateTimetable(`${startDay.getFullYear()}-${startDay.getMonth()+1}-${startDay.getDate()}`, `${endDay.getFullYear()}-${endDay.getMonth()+1}-${endDay.getDate()}`).then(function(result){
-						  timetableDatas = result;
-					  }); */
-
-				isOrarendLoadedOnce = true
-
 			})
 		})
 	}
