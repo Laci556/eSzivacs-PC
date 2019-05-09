@@ -14,7 +14,7 @@
 
 | Platform (verzió) | Fájl neve |
 | -------- | --------------- |
-| Windows x64 (v1.4.0) | [`eSzivacs.exe`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.4.0/eSzivacs.exe) |
+| Windows x64 (v1.4.1) | [`eSzivacs.exe`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.4.1/eSzivacs.exe) |
 
 ## Jellemzők
 - :electron: Electron alapú felület
