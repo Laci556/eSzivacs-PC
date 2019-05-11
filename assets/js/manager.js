@@ -1556,9 +1556,17 @@ document.getElementById('totray').addEventListener('input', function (evt) {
 	})
 })
 
+if(!isDev){
+	loggerAutoUpdater.log('Inicializálás...')
+	ipcRenderer.send('autoUpdateAction', 'initAutoUpdater', true)
+} else {
+	loggerAutoUpdater.log('Fejlesztési környezetben az Automatikus frissítési szolgáltatás le van tiltva.')
+}
 
-loggerAutoUpdater.log('Initializing..')
-ipcRenderer.send('autoUpdateAction', 'initAutoUpdater', true)
+function changeUpdateState(state, text){
+	document.getElementById("updateState").innerHTML = state
+	document.getElementById("updateText").innerHTML = text
+}
 
 if(!isDev){
 	// Initialize auto updates in production environments.
@@ -1567,10 +1575,12 @@ if(!isDev){
 		switch (arg) {
 			case 'checking-for-update':
 				loggerAutoUpdater.log('Frissítések keresése...')
+				changeUpdateState('cached', 'Frissítések keresése...')
 				break
 			case 'update-available':
 				loggerAutoUpdaterSuccess.log('Új verzió érhető el!', info.version)
 
+				changeUpdateState('arrow_downward', 'Új verzió érhető el!')
 				if (process.platform === 'darwin') {
 					info.darwindownload = `https://github.com/pepyta/eSzivacs-PC/releases/download/v${info.version}/eSzivacs.dmg`
 					showUpdateUI(info)
@@ -1579,16 +1589,18 @@ if(!isDev){
 				populateSettingsUpdateInformation(info)
 				break
 			case 'update-downloaded':
-				loggerAutoUpdaterSuccess.log('Update ' + info.version + ' ready to be installed.')
-
+				loggerAutoUpdaterSuccess.log('A v' + info.version + ' frissítés készen áll a telepítésre.')
+				changeUpdateState('build', 'Az új frissítés készen áll a telepítésre!')
 				var toastHTML = '<span>Új frissítés érhető el!</span><button id="quitAndInstall" class="btn-flat toast-action">Újraindítás</button>';
 				
 				M.toast({html: toastHTML});
-				document.getElementById('quitAndInstall').on('click', ipcRenderer.send('autoUpdateAction', 'installUpdateNow'))
+				document.getElementById('quitAndInstall').addEventListener('click', function(){
+					ipcRenderer.send('autoUpdateAction', 'installUpdateNow')
+				})
 				break
 			case 'update-not-available':
-				loggerAutoUpdater.log('No new update found.')
-				settingsUpdateButtonStatus('Check for Updates')
+				loggerAutoUpdater.log('Nincs elérhető frissítés.')
+				changeUpdateState('done', 'Az eSzivacs legfrisseb verzióját használod!')
 				break
 			case 'ready':
 				updateCheckListener = setInterval(() => {
@@ -1614,3 +1626,9 @@ if(!isDev){
 		}
 	})
 }
+
+document.getElementById("version").innerHTML = require('./../package.json').version
+const { shell } = require('electron')
+document.getElementById("linkGithub").addEventListener('click', function(){
+	shell.openExternal("https://github.com/pepyta/eSzivacs-PC")
+})

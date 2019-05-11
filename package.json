@@ -1,6 +1,6 @@
 {
   "name": "eszivacs-pc",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Egy non-profit kliens a Kréta rendszerhez, diákoknak.",
   "main": "main.js",
   "scripts": {
