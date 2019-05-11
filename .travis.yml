@@ -47,4 +47,4 @@ deploy:
   file_glob: true
   file: dist/*
   skip_cleanup: true
-  draft: true
+  draft: false
