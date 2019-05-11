@@ -1421,7 +1421,7 @@ document.querySelector('#login').addEventListener('submit', function (e) {
 
 					currentUser = `${id}-${instituteCode}`
 					file.getGlobal('users', []).then(function (result2, err) {
-						var data = result2
+						var data = []
 						var user = {
 							InstituteCode: instituteCode,
 							Id: id,
