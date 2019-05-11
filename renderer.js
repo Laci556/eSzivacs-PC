@@ -1,8 +1,6 @@
 const electron = require('electron')
 const ipcRenderer = electron.ipcRenderer
 
-let lastMsgId = 0
-
 window.quitAndInstall = function () {
 	electron.remote.autoUpdater.quitAndInstall()
 }

@@ -1,5 +1,4 @@
 module.exports = {
-    showNavbar(toShow)
   toggleNav: function(toShow) {
     showNavbar(toShow);
   }

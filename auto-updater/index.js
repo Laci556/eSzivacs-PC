@@ -18,8 +18,8 @@ if (os.platform() === 'darwin') {
 // https://update.electronjs.org/pepyta/eSzivacs-PC/win32-x64/1.0.0
 
 function init (mainWindow) {
-  mainWindow.webContents.send('console', updateFeed)
-  mainWindow.webContents.send('console', `App version: ${appVersion}`)
+  //mainWindow.webContents.send('console', updateFeed)
+  //mainWindow.webContents.send('console', `App version: ${appVersion}`)
   mainWindow.webContents.send('console', `🖥 App version: ${appVersion}`)
 
   if (initialized || !updateFeed || process.env.NODE_ENV === 'development') { return }
