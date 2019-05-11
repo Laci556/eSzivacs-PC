@@ -14,8 +14,9 @@
 
 | Platform (verzió) | Fájl neve |
 | -------- | --------------- |
-| Windows x64 (v1.4.1) | [`eSzivacs.exe`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.4.1/eSzivacs.exe) |
-| macOS (v1.4.1) | [`eSzivacs.dmg`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.4.1/eSzivacs.dmg) |
+| Windows x64 (v1.5.0) | [`eSzivacs.exe`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.5.0/eSzivacs.exe) |
+| macOS (v1.5.0) | [`eSzivacs.dmg`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.5.0/eSzivacs.dmg) |
+| Linux (v1.5.0) | [`eSzivacs.AppImage`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.5.0/eSzivacs.AppImage) |
 
 ## Jellemzők
 - :electron: Electron alapú felület
