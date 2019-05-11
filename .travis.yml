@@ -13,7 +13,12 @@ matrix:
       language: generic
     - os: windows
       language: node_js
-      node_js: "10"
+      node_js:
+      - "node"
+      - "10"
+      - "8"
+      - "6"
+      - "5"
 
 cache:
   directories:
