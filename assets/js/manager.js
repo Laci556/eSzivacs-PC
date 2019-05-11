@@ -3,8 +3,16 @@
 const kreta = require('./js/kreta')
 const file = require('./js/file')
 const os = require('os')
+const LoggerUtil = require('./js/loggerutil')
+const {ipcRenderer} = require('electron')
 
+const loggerUICore = LoggerUtil('%c[UICore]', 'color: #000668; font-weight: bold')
+const loggerAutoUpdater = LoggerUtil('%c[AutoUpdater]', 'color: #000668; font-weight: bold')
+const loggerAutoUpdaterSuccess = LoggerUtil('%c[AutoUpdater]', 'color: #209b07; font-weight: bold')
 require('../renderer.js')
+
+
+const isDev = require('./js/isdev')
 
 M.AutoInit()
 
@@ -27,16 +35,16 @@ var timetableDatas = []
 var positionInTime = 0
 
 function getSchools() {
-	return new Promise(function(resolve, reject) {
-		file.getGlobal('schools').then(function(result, err) {
+	return new Promise(function (resolve, reject) {
+		file.getGlobal('schools').then(function (result, err) {
 			if (err) reject(err)
 			//M.toast({html: "Iskolák betöltése folyamatban..."})
 			if (result != undefined) {
 				//M.toast({html: "Sikeres betöltés: fájlból"})
 				resolve(result)
 			} else {
-				updateSchools().then(function() {
-					getSchools().then(function(result2) {
+				updateSchools().then(function () {
+					getSchools().then(function (result2) {
 						//M.toast({html: "Sikeres betöltés: letöltve az internetről"})
 						resolve(result2)
 					})
@@ -47,10 +55,10 @@ function getSchools() {
 }
 
 function updateSchools() {
-	return new Promise(function(resolve, reject) {
-		kreta.getSchools().then(function(result, err) {
+	return new Promise(function (resolve, reject) {
+		kreta.getSchools().then(function (result, err) {
 			if (err) reject(err)
-			file.saveGlobal('schools', result).then(function() {
+			file.saveGlobal('schools', result).then(function () {
 				resolve('')
 			})
 		})
@@ -67,7 +75,7 @@ function showPage(page, hideEveryThing) {
 		hidePage('beallitasok')
 	}
 	document.getElementById(page).style.display = 'block'
-	loadUserDatas().then(function(result) {
+	loadUserDatas().then(function (result) {
 		document.getElementById('username').innerHTML = result['Name']
 	})
 	if (page == 'login') {
@@ -105,7 +113,7 @@ function resetPages() {
 
 function updateMyDatas() {
 	updateUserDatas().then(
-		function(result) {
+		function (result) {
 			if (result == 'done') {
 				// resetPages()
 				// showPage(currentPage, true)
@@ -113,16 +121,16 @@ function updateMyDatas() {
 				M.toast({ html: 'Sikeresen frissítetted az adataidat!' })
 			}
 		},
-		function(err) {
+		function (err) {
 			showPage('login', true)
 		}
 	)
 }
 
-require('electron').remote.app.on('window-all-closed', function() {})
+require('electron').remote.app.on('window-all-closed', function () { })
 
 function initAutoCompleteForLoginSchools() {
-	getSchools().then(function(result) {
+	getSchools().then(function (result) {
 		var elems = document.querySelectorAll('#schools')
 		var data = {}
 		var i = 0
@@ -179,7 +187,7 @@ function showNavbar(toShow) {
 		)
 
 		titleBarColor = '#000'
-			//'-webkit-linear-gradient(top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)'
+		//'-webkit-linear-gradient(top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)'
 		showTitleBarLogo = 'none'
 		showNavBar = 'block'
 
@@ -194,64 +202,64 @@ function showNavbar(toShow) {
 		var consoleButtons = document.getElementsByClassName('console')
 		var settingsButtons = document.getElementsByClassName('settings')
 
-		loadUserDatas().then(function(result) {
+		loadUserDatas().then(function (result) {
 			document.getElementById('name').innerHTML = result['Name']
 			document.getElementById('school').innerHTML = result['InstituteName']
 		})
 
 		for (var i = 0; i < fooldalButtons.length; i++) {
-			(function(index) {
+			(function (index) {
 				fooldalButtons[index].addEventListener('click', fooldal)
 			})(i)
 		}
 		for (var i = 0; i < jegyekButtons.length; i++) {
-			(function(index) {
+			(function (index) {
 				jegyekButtons[index].addEventListener('click', jegyekFunc)
 			})(i)
 		}
 		for (var i = 0; i < hianyzasokButtons.length; i++) {
-			(function(index) {
+			(function (index) {
 				hianyzasokButtons[index].addEventListener('click', hianyzasokFunc)
 			})(i)
 		}
 		for (var i = 0; i < logoutButtons.length; i++) {
-			(function(index) {
+			(function (index) {
 				logoutButtons[index].addEventListener('click', logout)
 			})(i)
 		}
 		for (var i = 0; i < updateMyDatasButtons.length; i++) {
-			(function(index) {
+			(function (index) {
 				updateMyDatasButtons[index].addEventListener('click', updateMyDatas)
 			})(i)
 		}
 		for (var i = 0; i < orarendButtons.length; i++) {
-			(function(index) {
+			(function (index) {
 				orarendButtons[index].addEventListener('click', orarendFunc)
 			})(i)
 		}
 		for (var i = 0; i < timetableBackButtons.length; i++) {
-			(function(index) {
+			(function (index) {
 				timetableBackButtons[index].addEventListener('click', timetableBack)
 			})(i)
 		}
 		for (var i = 0; i < timetableFwButtons.length; i++) {
-			(function(index) {
+			(function (index) {
 				timetableFwButtons[index].addEventListener('click', timetableFw)
 			})(i)
 		}
 		for (var i = 0; i < consoleButtons.length; i++) {
-			(function(index) {
+			(function (index) {
 				consoleButtons[index].addEventListener('click', openConsole)
 			})(i)
 		}
 		for (var i = 0; i < settingsButtons.length; i++) {
-			(function(index) {
+			(function (index) {
 				settingsButtons[index].addEventListener('click', settingsFunc)
 			})(i)
 		}
 	} else {
 		titleBarColor = '#000'
-			//'-webkit-linear-gradient(top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)'
+		//'-webkit-linear-gradient(top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)'
 		showTitleBarLogo = 'block'
 		showNavBar = 'none'
 	}
@@ -267,8 +275,8 @@ function hidePage(page) {
 }
 
 function loadLoginDatas() {
-	return new Promise(function(resolve, reject) {
-		file.getGlobal('users').then(function(result) {
+	return new Promise(function (resolve, reject) {
+		file.getGlobal('users').then(function (result) {
 			if (result == undefined) {
 				resolve(undefined)
 			}
@@ -277,7 +285,7 @@ function loadLoginDatas() {
 					if (result[i]['Selected']) {
 						id = result[i]['Id']
 						currentUser = `${result[i]['Id']}-${result[i]['InstituteCode']}`
-						file.get(currentUser, 'login').then(function(result, err) {
+						file.get(currentUser, 'login').then(function (result, err) {
 							if (err) reject(err)
 							// console.log(result)
 							resolve(result)
@@ -292,11 +300,11 @@ function loadLoginDatas() {
 }
 
 function saveLoginDatas(user, id, instituteCode) {
-	return new Promise(function(resolve, reject) {
+	return new Promise(function (resolve, reject) {
 		user['InstituteCode'] = instituteCode
 		file
 			.save(`${id}-${instituteCode}`, 'login', user)
-			.then(function(result, err) {
+			.then(function (result, err) {
 				if (err) reject(err)
 				resolve(result)
 			})
@@ -307,8 +315,8 @@ var triesToUpdateTimetable = 0
 function updateTimetable(startDate, endDate) {
 	triesToUpdateTimetable++
 	// if (triesToUpdateTimetable < 4) {
-	return new Promise(function(resolve, reject) {
-		file.get(currentUser, 'login').then(function(result) {
+	return new Promise(function (resolve, reject) {
+		file.get(currentUser, 'login').then(function (result) {
 			kreta
 				.getTimetable(
 					result['access_token'],
@@ -317,19 +325,19 @@ function updateTimetable(startDate, endDate) {
 					endDate
 				)
 				.then(
-					function() {
+					function () {
 						// console.log(`${startDate} -- ${endDate} `)
 						resolve(result)
 					},
-					function() {
+					function () {
 						// Hiba esetén újrapróbálkozás
 						kreta
 							.refreshToken(result['refresh_token'], result['InstituteCode'])
-							.then(function(result2) {
+							.then(function (result2) {
 								saveLoginDatas(result2, result['InstituteCode']).then(
-									function() {
-										updateUserDatas().then(function() {
-											updateTimetable(startDate, endDate).then(function(
+									function () {
+										updateUserDatas().then(function () {
+											updateTimetable(startDate, endDate).then(function (
 												result
 											) {
 												resolve(result)
@@ -359,11 +367,11 @@ function updateTimetable(startDate, endDate) {
 // NEM MŰKÖDIK!!!
 function refreshToken() {
 	// Bejelentkezési tokenek frissítése automatikusan
-	file.get(currentUser, 'login').then(function(result) {
-		setTimeout(function() {
+	file.get(currentUser, 'login').then(function (result) {
+		setTimeout(function () {
 			kreta
 				.refreshToken(result['refresh_token'], instituteCode)
-				.then(function(result) {
+				.then(function (result) {
 					file.save(currentUser, 'login', result)
 				})
 			refreshToken()
@@ -372,12 +380,12 @@ function refreshToken() {
 }
 
 function updateUserDatas() {
-	return new Promise(function(resolve, reject) {
+	return new Promise(function (resolve, reject) {
 		// console.log(currentUser)
-		file.get(currentUser, 'login').then(function(result) {
+		file.get(currentUser, 'login').then(function (result) {
 			var instituteCode
-			file.getGlobal('users').then(function(result2) {
-				result2.forEach(function(element) {
+			file.getGlobal('users').then(function (result2) {
+				result2.forEach(function (element) {
 					if (element['Id'] == id) {
 						instituteCode = element['InstituteCode']
 					}
@@ -385,20 +393,20 @@ function updateUserDatas() {
 				kreta
 					.getUserDatas(result['access_token'], instituteCode, null, null)
 					.then(
-						function(result2) {
+						function (result2) {
 							file.save(currentUser, 'user', result2)
 							resolve('done')
 						},
-						function() {
+						function () {
 							kreta.refreshToken(result['refresh_token'], instituteCode).then(
-								function(result2) {
+								function (result2) {
 									file.save(currentUser, 'login', result2)
-									updateUserDatas().then(function(result3, err) {
+									updateUserDatas().then(function (result3, err) {
 										if (err) reject(err)
 										resolve(result3)
 									})
 								},
-								function() {
+								function () {
 									showPage('login', true)
 								}
 							)
@@ -410,18 +418,18 @@ function updateUserDatas() {
 }
 
 function loadUserDatas() {
-	return new Promise(function(resolve, reject) {
-		file.get(currentUser, 'user').then(function(result, err) {
+	return new Promise(function (resolve, reject) {
+		file.get(currentUser, 'user').then(function (result, err) {
 			if (err) reject(err)
 			// console.log(result)
 			if (result != undefined) {
 				// console.log('From file')
 				resolve(result)
 			} else {
-				updateUserDatas().then(function(result, err) {
+				updateUserDatas().then(function (result, err) {
 					// console.log('Updating...')
 					if (err) reject(err)
-					loadUserDatas().then(function(result2, err) {
+					loadUserDatas().then(function (result2, err) {
 						// console.log('Updated and value returned!')
 						if (err) reject(err)
 						// Valamiért nem olvassa ki első alkalommal, amikor még a fájlba is írunk, ezért csinálunk egy ilyen csúfságot
@@ -434,7 +442,7 @@ function loadUserDatas() {
 }
 
 loadLoginDatas().then(
-	function(result) {
+	function (result) {
 		loginDatas = result
 		if (loginDatas != undefined) {
 			// console.log('Megvan az adat!')
@@ -444,7 +452,7 @@ loadLoginDatas().then(
 			showPage('login')
 		}
 	},
-	function(err) {
+	function (err) {
 		// console.log('Nincsen login.json, most fogunk csinálni!')
 		showPage('login')
 	}
@@ -452,7 +460,7 @@ loadLoginDatas().then(
 
 function renderBeallitasok() {
 	if (os.platform() == 'win32') {
-		file.getGlobal('settings').then(function(result) {
+		file.getGlobal('settings').then(function (result) {
 			if (result['startup'] == true) {
 				document.getElementById('startup').checked = true
 			} else {
@@ -482,13 +490,13 @@ function renderBeallitasok() {
 initAutoCompleteForLoginSchools()
 
 function renderFooldal() {
-	file.get(currentUser, 'settings', {}).then(function(result) {
+	file.get(currentUser, 'settings', {}).then(function (result) {
 		if (result['notifications']) {
 			startNotificationListener()
 		}
 	})
 
-	loadUserDatas().then(function(result) {
+	loadUserDatas().then(function (result) {
 		if (!isFooldalLoadedOnce) {
 			var gradesNumber = 0
 			var strázsa = 0
@@ -497,12 +505,12 @@ function renderFooldal() {
 					document.getElementById('fooldalGrades').innerHTML += `
 										<li class="collection-item">
 												<div>${
-													result['Evaluations'][strázsa]['Subject']
-												}<a href="#!" class="secondary-content">${
+						result['Evaluations'][strázsa]['Subject']
+						}<a href="#!" class="secondary-content">${
 						result['Evaluations'][strázsa]['NumberValue'] > 0
 							? result['Evaluations'][strázsa]['NumberValue']
 							: result['Evaluations'][strázsa]['Value']
-					}</a></div>
+						}</a></div>
 										</li>
 										`
 					gradesNumber++
@@ -510,17 +518,17 @@ function renderFooldal() {
 				strázsa++
 			}
 			var isFirstNote = true
-			result['Notes'].forEach(function(element) {
+			result['Notes'].forEach(function (element) {
 				document.getElementById('fooldalNotes').innerHTML += `
 								<li>
 										<ul class="collapsible">
 												<li ${isFirstNote ? `class="active"` : ''}>
 														<div class="collapsible-header">${
-															element['Title']
-														}</div>
+					element['Title']
+					}</div>
 														<div class="collapsible-body"><span>${
-															element['Content']
-														}</span></div>
+					element['Content']
+					}</span></div>
 												</li>
 										</ul>
 								</li>
@@ -528,17 +536,17 @@ function renderFooldal() {
 				isFirstNote = false
 			})
 
-			loadLoginDatas().then(function(result, err){
+			loadLoginDatas().then(function (result, err) {
 				var todayClasses = `<div class="col s12 m4">
 				<ul class="collection with-header" id="fooldalGrades">
 					<li class="collection-header">
 						<h4>Mai óráid</h4>
 					</li>`
-				if(err) throw new Error('Hiba: ' + err)
-				
-				file.getGlobal('users').then(function(users) {
+				if (err) throw new Error('Hiba: ' + err)
+
+				file.getGlobal('users').then(function (users) {
 					var instituteCode
-					users.forEach(function(user) {
+					users.forEach(function (user) {
 						if (user['Id'] == currentUser.split('-')[0]) {
 							instituteCode = user['InstituteCode']
 						}
@@ -553,33 +561,34 @@ function renderFooldal() {
 							instituteCode,
 							formatted_date,
 							formatted_date
-						).then(function(result, err){
+						).then(function (result, err) {
 							console.log(result)
-							result.forEach(function(element){
+							result.forEach(function (element) {
 								van = true
 								todayClasses += `<li class="collection-item"><div class="truncate">${element["Subject"]} <a href="#" class="secondary-content">${new Date(element["StartTime"]).getHours()}:${new Date(element["StartTime"]).getMinutes()} - ${new Date(element["EndTime"]).getHours()}:${new Date(element["EndTime"]).getMinutes()}</a></div></li>`
 
 							})
-							
+
 							todayClasses += `</ul>`
-							
-							if(van){ 
-								document.getElementById('fooldal').innerHTML += todayClasses 
+
+							if (van) {
+								document.getElementById('fooldal').innerHTML += todayClasses
 							}
 
 							M.Collapsible.init(document.querySelectorAll('.collapsible'), {})
-							isFooldalLoadedOnce = true;
 						})
 				})
 			})
+			
+			isFooldalLoadedOnce = true;
 		}
 	})
 }
 
 function renderGrades() {
 	if (!isJegyeimLoadedOnce) {
-		loadUserDatas().then(function(result) {
-			result['Evaluations'].forEach(function(element) {
+		loadUserDatas().then(function (result) {
+			result['Evaluations'].forEach(function (element) {
 				var isThisContains = false
 				for (var i = 0; i < jegyek[element['Type']].length; i++) {
 					if (jegyek[element['Type']][i]['name'] == element['Subject']) {
@@ -605,7 +614,7 @@ function renderGrades() {
 				}
 			})
 
-			result['Evaluations'].forEach(function(element) {
+			result['Evaluations'].forEach(function (element) {
 				var isThisContains = false
 				for (var i = 0; i < jegyek['MidYearDate'].length; i++) {
 					if (
@@ -624,7 +633,7 @@ function renderGrades() {
 				}
 			})
 
-			result['Evaluations'].forEach(function(element) {
+			result['Evaluations'].forEach(function (element) {
 				for (var i = 0; i < jegyek['MidYearDate'].length; i++) {
 					if (
 						jegyek['MidYearDate'][i]['date'] == element['Date'] &&
@@ -649,8 +658,8 @@ function renderGrades() {
 				}
 			})
 
-			jegyek['MidYear'].forEach(function(element) {
-				result['SubjectAverages'].forEach(function(element2) {
+			jegyek['MidYear'].forEach(function (element) {
+				result['SubjectAverages'].forEach(function (element2) {
 					if (element2['Subject'] == element['name']) {
 						element['avg'] = element2['Value']
 						element['classAvg'] = element2['ClassValue']
@@ -659,7 +668,7 @@ function renderGrades() {
 			})
 
 			var numValueQuantitiy = 0
-			result['Evaluations'].forEach(function(element) {
+			result['Evaluations'].forEach(function (element) {
 				for (var i = 0; i < jegyek[element['Type']].length; i++) {
 					var subjectName = element['Subject']
 					if (element['Subject'] == null) {
@@ -688,7 +697,7 @@ function renderGrades() {
 				}
 			})
 
-			jegyek['MidYear'].sort(function(a, b) {
+			jegyek['MidYear'].sort(function (a, b) {
 				if (a.name < b.name) {
 					return -1
 				}
@@ -698,7 +707,7 @@ function renderGrades() {
 				return 0
 			})
 
-			jegyek['MidYearDate'].sort(function(a, b) {
+			jegyek['MidYearDate'].sort(function (a, b) {
 				if (a.date < b.date) {
 					return 1
 				}
@@ -708,7 +717,7 @@ function renderGrades() {
 				return 0
 			})
 
-			jegyek['HalfYear'].sort(function(a, b) {
+			jegyek['HalfYear'].sort(function (a, b) {
 				if (a.name < b.name) {
 					return -1
 				}
@@ -718,7 +727,7 @@ function renderGrades() {
 				return 0
 			})
 
-			jegyek['EndYear'].sort(function(a, b) {
+			jegyek['EndYear'].sort(function (a, b) {
 				if (a.name < b.name) {
 					return -1
 				}
@@ -852,9 +861,9 @@ function renderMidYearDateGrades(row) {
 		header.classList.add('collapsible-header')
 		header.innerHTML = `${
 			jegyek[nameOfType][j]['date'].split('T')[0].split('-')[0]
-		}. ${jegyek[nameOfType][j]['date'].split('T')[0].split('-')[1]}. ${
+			}. ${jegyek[nameOfType][j]['date'].split('T')[0].split('-')[1]}. ${
 			jegyek[nameOfType][j]['date'].split('T')[0].split('-')[2]
-		}. - ${jegyek[nameOfType][j]['grades'].length} db értékelés`
+			}. - ${jegyek[nameOfType][j]['grades'].length} db értékelés`
 
 		var body = document.createElement('div')
 		body.classList.add('collapsible-body')
@@ -936,7 +945,7 @@ function renderMidYearGrades(row) {
 		header.classList.add('collapsible-header')
 		header.innerHTML = `${jegyek[nameOfType][j]['name']} - &nbsp${
 			jegyek[nameOfType][j]['avg']
-		}`
+			}`
 
 		var body = document.createElement('div')
 		body.classList.add('collapsible-body')
@@ -992,20 +1001,20 @@ function renderMidYearGrades(row) {
 												<tr>
 														<td><b>Dátum</b></td>
 														<td>${
-															currentGrade['Date'].split('T')[0].split('-')[0]
-														}. ${
+				currentGrade['Date'].split('T')[0].split('-')[0]
+				}. ${
 				currentGrade['Date'].split('T')[0].split('-')[1]
-			}. ${currentGrade['Date'].split('T')[0].split('-')[2]}</td>
+				}. ${currentGrade['Date'].split('T')[0].split('-')[2]}</td>
 												</tr>
 												<tr>
 														<td><b>Rögzítés ideje</b></td>
 														<td>${
-															currentGrade['CreatingTime']
-																.split('T')[0]
-																.split('-')[0]
-														}. ${
+				currentGrade['CreatingTime']
+					.split('T')[0]
+					.split('-')[0]
+				}. ${
 				currentGrade['CreatingTime'].split('T')[0].split('-')[1]
-			}. ${currentGrade['CreatingTime'].split('T')[0].split('-')[2]}</td>
+				}. ${currentGrade['CreatingTime'].split('T')[0].split('-')[2]}</td>
 												</tr>
 												<tr>
 														<td><b>Értékelés formája</b></td>
@@ -1062,7 +1071,7 @@ function renderSpecialGrades(nameOfType, displayName, row) {
 		li.classList.add('collection-item')
 		var sum = 0
 		var quantity = 0
-		jegyek[nameOfType].forEach(function(element) {
+		jegyek[nameOfType].forEach(function (element) {
 			// console.log(element)
 			// console.log(element['grades'][0]['NumberValue'])
 			if (
@@ -1084,9 +1093,9 @@ function renderSpecialGrades(nameOfType, displayName, row) {
 			li.classList.add('collection-item')
 			li.innerHTML = `<div>${
 				jegyek[nameOfType][j]['name']
-			}<a href="#" class="secondary-content">${
+				}<a href="#" class="secondary-content">${
 				jegyek[nameOfType][j]['grades'][k]['Value']
-			}</p></div>`
+				}</p></div>`
 			ul.appendChild(li)
 		}
 	}
@@ -1107,7 +1116,7 @@ function timetableBack() {
 	var today = new Date()
 	positionInTime--
 	today.setDate(today.getDate() + 7 * positionInTime)
-	Date.prototype.addDays = function(days) {
+	Date.prototype.addDays = function (days) {
 		var date = new Date(this.valueOf())
 		date.setDate(date.getDate() + days)
 		return date
@@ -1120,9 +1129,9 @@ function timetableBack() {
 	isOrarendLoadedOnce = false
 	updateTimetable(
 		`${startDay.getFullYear()}-${startDay.getMonth() +
-			1}-${startDay.getDate()}`,
+		1}-${startDay.getDate()}`,
 		`${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`
-	).then(function(result) {
+	).then(function (result) {
 		renderTimetable(positionInTime)
 	})
 }
@@ -1138,7 +1147,7 @@ function timetableFw() {
 	var today = new Date()
 	positionInTime++
 	today.setDate(today.getDate() + 7 * positionInTime)
-	Date.prototype.addDays = function(days) {
+	Date.prototype.addDays = function (days) {
 		var date = new Date(this.valueOf())
 		date.setDate(date.getDate() + days)
 		return date
@@ -1151,17 +1160,17 @@ function timetableFw() {
 	isOrarendLoadedOnce = false
 	updateTimetable(
 		`${startDay.getFullYear()}-${startDay.getMonth() +
-			1}-${startDay.getDate()}`,
+		1}-${startDay.getDate()}`,
 		`${endDay.getFullYear()}-${endDay.getMonth() + 1}-${endDay.getDate()}`
-	).then(function(result) {
+	).then(function (result) {
 		renderTimetable(positionInTime)
 	})
 }
 
 function renderTimetable(positionInTime) {
 	if (!isOrarendLoadedOnce) {
-		loadLoginDatas().then(function(result) {
-			Date.prototype.addDays = function(days) {
+		loadLoginDatas().then(function (result) {
+			Date.prototype.addDays = function (days) {
 				var date = new Date(this.valueOf())
 				date.setDate(date.getDate() + days)
 				return date
@@ -1182,12 +1191,12 @@ function renderTimetable(positionInTime) {
 			document.getElementById(
 				'timetableDate'
 			).innerHTML = `${startDay.getFullYear()}. ${startDay.getMonth() +
-				1}. ${startDay.getDate()}. - ${endDay.getFullYear()}. ${endDay.getMonth() +
-				1}. ${endDay.getDate()}.`
+			1}. ${startDay.getDate()}. - ${endDay.getFullYear()}. ${endDay.getMonth() +
+			1}. ${endDay.getDate()}.`
 
-			file.getGlobal('users').then(function(users) {
+			file.getGlobal('users').then(function (users) {
 				var instituteCode
-				users.forEach(function(user) {
+				users.forEach(function (user) {
 					if (user['Id'] == currentUser.split('-')[0]) {
 						instituteCode = user['InstituteCode']
 					}
@@ -1199,13 +1208,13 @@ function renderTimetable(positionInTime) {
 						result['access_token'],
 						instituteCode,
 						`${startDay.getFullYear()}-${startDay.getMonth() +
-							1}-${startDay.getDate()}`,
+						1}-${startDay.getDate()}`,
 						`${endDay.getFullYear()}-${endDay.getMonth() +
-							1}-${endDay.getDate()}`
+						1}-${endDay.getDate()}`
 					)
-					.then(function(result) {
+					.then(function (result) {
 						timetableDatas = []
-						result.forEach(function(element) {
+						result.forEach(function (element) {
 							var isThisContains = false
 							for (var i = 0; i < timetableDatas.length; i++) {
 								if (timetableDatas[i]['Date'] == element['Date']) {
@@ -1221,7 +1230,7 @@ function renderTimetable(positionInTime) {
 							}
 						})
 
-						result.forEach(function(element) {
+						result.forEach(function (element) {
 							for (var i = 0; i < timetableDatas.length; i++) {
 								if (timetableDatas[i]['Date'] == element['Date']) {
 									timetableDatas[i]['Classes'].push(element)
@@ -1229,26 +1238,26 @@ function renderTimetable(positionInTime) {
 							}
 						})
 
-						timetableDatas.forEach(function(element) {
+						timetableDatas.forEach(function (element) {
 							var toAppend = new Date(element['Date']).getDay()
 
-							element['Classes'].forEach(function(ora) {
+							element['Classes'].forEach(function (ora) {
 								var li = document.createElement('li')
 								li.innerHTML = `
 														<div class="collapsible-header"><span class="col s12">${
-															ora['Subject']
-														} <span
+									ora['Subject']
+									} <span
 																				class="right">${
-																					ora['CalendarOraType'] == 'UresOra'
-																						? `<span class="red-text">${
-																								ora['StateName']
-																							}</span>`
-																						: ora['DeputyTeacher'] == ''
-																						? ora['ClassRoom']
-																						: `<span class="red-text">${
-																								ora['Teacher']
-																							}</span>`
-																				}</span></span></div>
+									ora['CalendarOraType'] == 'UresOra'
+										? `<span class="red-text">${
+										ora['StateName']
+										}</span>`
+										: ora['DeputyTeacher'] == ''
+											? ora['ClassRoom']
+											: `<span class="red-text">${
+											ora['Teacher']
+											}</span>`
+									}</span></span></div>
 														<div class="collapsible-body">
 																<table>
 																		<tr>
@@ -1270,14 +1279,14 @@ function renderTimetable(positionInTime) {
 																		<tr>
 																				<td><b>Időtartam</b></td>
 																				<td>${
-																					ora['StartTime']
-																						.split('T')[1]
-																						.split(':')[0]
-																				}:${
+									ora['StartTime']
+										.split('T')[1]
+										.split(':')[0]
+									}:${
 									ora['StartTime'].split('T')[1].split(':')[1]
-								}-${ora['EndTime'].split('T')[1].split(':')[0]}:${
+									}-${ora['EndTime'].split('T')[1].split(':')[0]}:${
 									ora['EndTime'].split('T')[1].split(':')[1]
-								}</td>
+									}</td>
 																		</tr>
 																</table>
 				
@@ -1300,10 +1309,10 @@ function renderTimetable(positionInTime) {
 
 function renderAbsences() {
 	if (!isHianyzasokLoadedOnce) {
-		loadUserDatas().then(function(result) {
-			result['Absences'].forEach(function(element) {
+		loadUserDatas().then(function (result) {
+			result['Absences'].forEach(function (element) {
 				var isHianyzasokContainsDay = false
-				hianyzasok.forEach(function(element2) {
+				hianyzasok.forEach(function (element2) {
 					if (element['LessonStartTime'] == element2['Date']) {
 						isHianyzasokContainsDay = true
 					}
@@ -1319,15 +1328,15 @@ function renderAbsences() {
 					hianyzasok.push(day)
 				}
 			})
-			result['Absences'].forEach(function(element) {
-				hianyzasok.forEach(function(element2) {
+			result['Absences'].forEach(function (element) {
+				hianyzasok.forEach(function (element2) {
 					if (element['LessonStartTime'] == element2['Date']) {
 						element2['Lessons'].push(element['Subject'])
 					}
 				})
 			})
 
-			hianyzasok.sort(function(a, b) {
+			hianyzasok.sort(function (a, b) {
 				if (a.Date < b.Date) {
 					return 1
 				}
@@ -1339,22 +1348,22 @@ function renderAbsences() {
 
 			var ul = document.createElement('ul')
 			ul.classList.add('collapsible')
-			hianyzasok.forEach(function(element) {
+			hianyzasok.forEach(function (element) {
 				var li = document.createElement('li')
 				var header = document.createElement('div')
 				header.classList.add('collapsible-header')
 
 				header.innerHTML = `${element['Date'].split('T')[0].split('-')[0]}. ${
 					element['Date'].split('T')[0].split('-')[1]
-				}. ${element['Date'].split('T')[0].split('-')[2]} -&nbsp${
+					}. ${element['Date'].split('T')[0].split('-')[2]} -&nbsp${
 					element['Justification'] == 'Justified'
 						? `<span class='green-text'>Igazolt mulasztás (${
-								element['JustificationType']
-							})</span>`
+						element['JustificationType']
+						})</span>`
 						: element['Justification'] == 'BeJustified'
-						? "<span class='yellow-text'>Igazolandó mulasztás</span>"
-						: "<span class='red-text'>Igazolatlan mulasztás</span>"
-				}`
+							? "<span class='yellow-text'>Igazolandó mulasztás</span>"
+							: "<span class='red-text'>Igazolatlan mulasztás</span>"
+					}`
 
 				var body = document.createElement('div')
 				body.classList.add('collapsible-body')
@@ -1362,7 +1371,7 @@ function renderAbsences() {
 				var collection = document.createElement('ul')
 				collection.classList.add('collection')
 
-				element['Lessons'].forEach(function(element2) {
+				element['Lessons'].forEach(function (element2) {
 					var collLi = document.createElement('li')
 					collLi.classList.add('collection-item')
 					collLi.innerHTML = element2
@@ -1386,9 +1395,9 @@ function renderAbsences() {
 }
 
 // Handle logging in
-document.querySelector('#login').addEventListener('submit', function(e) {
-	getSchools().then(function(result) {
-		result.forEach(function(element) {
+document.querySelector('#login').addEventListener('submit', function (e) {
+	getSchools().then(function (result) {
+		result.forEach(function (element) {
 			if (element.Name == document.getElementById('schools').value) {
 				instituteCode = element.InstituteCode
 			}
@@ -1401,7 +1410,7 @@ document.querySelector('#login').addEventListener('submit', function(e) {
 				document.getElementById('password').value
 			)
 			.then(
-				function(result) {
+				function (result) {
 					// Handling successful login
 					// Storing school inside user.json
 					// result["InstituteCode"] = document.getElementById("schools").value
@@ -1411,7 +1420,7 @@ document.querySelector('#login').addEventListener('submit', function(e) {
 					id = document.getElementById('usernameInput').value
 
 					currentUser = `${id}-${instituteCode}`
-					file.getGlobal('users', []).then(function(result2, err) {
+					file.getGlobal('users', []).then(function (result2, err) {
 						var data = result2
 						var user = {
 							InstituteCode: instituteCode,
@@ -1419,9 +1428,9 @@ document.querySelector('#login').addEventListener('submit', function(e) {
 							Selected: true
 						}
 						data.push(user)
-						file.saveGlobal('users', data).then(function() {
+						file.saveGlobal('users', data).then(function () {
 							// console.log(result)
-							saveLoginDatas(result, id, instituteCode).then(function(
+							saveLoginDatas(result, id, instituteCode).then(function (
 								result,
 								err
 							) {
@@ -1433,7 +1442,7 @@ document.querySelector('#login').addEventListener('submit', function(e) {
 						})
 					})
 				},
-				function() {
+				function () {
 					// Handling bad login datas (pretty fast tho)
 					M.toast({ html: 'Rossz felhasználónév vagy jelszó!' })
 				}
@@ -1443,10 +1452,10 @@ document.querySelector('#login').addEventListener('submit', function(e) {
 	e.preventDefault()
 })
 
-document.getElementById('startup').addEventListener('input', function(evt) {
-	file.get(currentUser, 'settings', {}).then(function(result) {
+document.getElementById('startup').addEventListener('input', function (evt) {
+	file.get(currentUser, 'settings', {}).then(function (result) {
 		result['startup'] = document.getElementById('startup').checked
-		file.saveGlobal('settings', result).then(function() {
+		file.saveGlobal('settings', result).then(function () {
 			const electron = require('electron')
 			var AutoLaunch = require('auto-launch')
 
@@ -1466,16 +1475,16 @@ document.getElementById('startup').addEventListener('input', function(evt) {
 
 function notificationListener() {
 	updateUserDatas().then(
-		function() {
-			loadUserDatas().then(function(result) {
-				file.get(currentUser, 'viewedGrades', []).then(function(result2) {
+		function () {
+			loadUserDatas().then(function (result) {
+				file.get(currentUser, 'viewedGrades', []).then(function (result2) {
 					if (result2.length > 0) {
 						// console.log(result2.length)
 
-						result['Evaluations'].forEach(function(element) {
-							file.get(currentUser, 'viewedGrades').then(function(result3) {
+						result['Evaluations'].forEach(function (element) {
+							file.get(currentUser, 'viewedGrades').then(function (result3) {
 								var viewed = false
-								result3.forEach(function(element2) {
+								result3.forEach(function (element2) {
 									if (element2['id'] == element['EvaluationId']) {
 										viewed = true
 									}
@@ -1497,7 +1506,7 @@ function notificationListener() {
 						})
 					} else {
 						var grades = []
-						result['Evaluations'].forEach(function(element) {
+						result['Evaluations'].forEach(function (element) {
 							var jegy = {
 								id: element['EvaluationId'],
 								subject: element['Subject'],
@@ -1510,7 +1519,7 @@ function notificationListener() {
 				})
 			})
 		},
-		function() {
+		function () {
 			M.toast({ html: 'Nem sikerült frissíteni az adataidat!' })
 			M.toast({ html: 'Próbáld meg manuálisan frissítani az adataidat!' })
 		}
@@ -1520,19 +1529,19 @@ function notificationListener() {
 function startNotificationListener() {
 	// console.log('A lekérdezés megtörtént!')
 	notificationListener()
-	setTimeout(function() {
+	setTimeout(function () {
 		startNotificationListener()
 	}, 1000 * 60 * 15)
 }
 
 document
 	.getElementById('notifications')
-	.addEventListener('input', function(evt) {
-		file.get(currentUser, 'settings', {}).then(function(result) {
+	.addEventListener('input', function (evt) {
+		file.get(currentUser, 'settings', {}).then(function (result) {
 			result['notifications'] = document.getElementById(
 				'notifications'
 			).checked
-			file.saveGlobal('settings', result).then(function() {
+			file.saveGlobal('settings', result).then(function () {
 				if (notifications) {
 					startNotificationListener()
 				}
@@ -1540,9 +1549,68 @@ document
 		})
 	})
 
-document.getElementById('totray').addEventListener('input', function(evt) {
-	file.get(currentUser, 'settings', {}).then(function(result) {
+document.getElementById('totray').addEventListener('input', function (evt) {
+	file.get(currentUser, 'settings', {}).then(function (result) {
 		result['totray'] = document.getElementById('totray').checked
 		file.saveGlobal('settings', result)
 	})
 })
+
+
+loggerAutoUpdater.log('Initializing..')
+ipcRenderer.send('autoUpdateAction', 'initAutoUpdater', true)
+
+if(!isDev){
+	// Initialize auto updates in production environments.
+	let updateCheckListener
+	ipcRenderer.on('autoUpdateNotification', (event, arg, info) => {
+		switch (arg) {
+			case 'checking-for-update':
+				loggerAutoUpdater.log('Frissítések keresése...')
+				break
+			case 'update-available':
+				loggerAutoUpdaterSuccess.log('Új verzió érhető el!', info.version)
+
+				if (process.platform === 'darwin') {
+					info.darwindownload = `https://github.com/pepyta/eSzivacs-PC/releases/download/v${info.version}/eSzivacs.dmg`
+					showUpdateUI(info)
+				}
+
+				populateSettingsUpdateInformation(info)
+				break
+			case 'update-downloaded':
+				loggerAutoUpdaterSuccess.log('Update ' + info.version + ' ready to be installed.')
+
+				var toastHTML = '<span>Új frissítés érhető el!</span><button id="quitAndInstall" class="btn-flat toast-action">Újraindítás</button>';
+				
+				M.toast({html: toastHTML});
+				document.getElementById('quitAndInstall').on('click', ipcRenderer.send('autoUpdateAction', 'installUpdateNow'))
+				break
+			case 'update-not-available':
+				loggerAutoUpdater.log('No new update found.')
+				settingsUpdateButtonStatus('Check for Updates')
+				break
+			case 'ready':
+				updateCheckListener = setInterval(() => {
+					ipcRenderer.send('autoUpdateAction', 'checkForUpdate')
+				}, 1800000)
+				ipcRenderer.send('autoUpdateAction', 'checkForUpdate')
+				break
+			case 'realerror':
+				if (info != null && info.code != null) {
+					if (info.code === 'ERR_UPDATER_INVALID_RELEASE_FEED') {
+						loggerAutoUpdater.log('No suitable releases found.')
+					} else if (info.code === 'ERR_XML_MISSED_ELEMENT') {
+						loggerAutoUpdater.log('No releases found.')
+					} else {
+						loggerAutoUpdater.error('Error during update check..', info)
+						loggerAutoUpdater.debug('Error Code:', info.code)
+					}
+				}
+				break
+			default:
+				loggerAutoUpdater.log('Unknown argument', arg)
+				break
+		}
+	})
+}

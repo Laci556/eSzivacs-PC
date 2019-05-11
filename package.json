@@ -74,6 +74,7 @@
     "ejs": "^2.6.1",
     "ejs-electron": "^2.0.3",
     "electron-builder-lib": "^20.23.1",
+    "electron-updater": "^4.0.6",
     "fs": "0.0.2",
     "hawk": "^7.0.10",
     "http": "0.0.0",

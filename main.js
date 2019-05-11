@@ -1,9 +1,11 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
+const autoUpdater = require('electron-updater').autoUpdater
 const path = require('path')
 const url = require('url')
+
+const isDev = require('./assets/js/isdev')
 //require('update-electron-app')()
-const autoUpdater = require('./auto-updater')
 
 require('ejs')
 require('ejs-electron')
@@ -105,10 +107,6 @@ function createWindow () {
     }) */
 
   // mainWindow.setMenu(null)
-
-  mainWindow.webContents.on('did-finish-load', () => {
-    autoUpdater.init(mainWindow)
-  })
 
   mainWindow.setResizable(true)
 
