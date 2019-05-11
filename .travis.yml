@@ -11,7 +11,7 @@ matrix:
     - os: linux
       services: docker
       language: generic
-    - os: win32
+    - os: windows
       language: node_js
       node_js: "10"
 
