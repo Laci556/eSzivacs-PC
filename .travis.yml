@@ -27,6 +27,7 @@ cache:
     - $HOME/.cache/electron-builder
 
 install:
+  - nvs use node/12.2.0/x64
   - npm install
 
 script:
@@ -42,11 +43,17 @@ before_cache:
 branches:
   except:
     - "/^v\\d+\\.\\d+\\.\\d+$/"
+before_deploy:
+  # Set up git user name and tag this commit
+  - git config --local user.name "Gál Péter"
+  - git config --local user.email "pepyta118@gmail.com"
+  # - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+  - git tag $TRAVIS_TAG
 
 deploy:
   provider: releases
   api_key: $GH_TOKEN
   file_glob: true
-  file: dist/*
+  file: dist/**/*
   skip_cleanup: true
   draft: true
