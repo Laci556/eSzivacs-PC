@@ -1,3 +1,4 @@
+'use strict'; 
 const kreta = require('./js/kreta')
 const fs = require('fs')
 const app2 = require('electron').remote.app
@@ -65,7 +66,6 @@ function showPage(page, hideEveryThing) {
 		hidePage('orarend')
 		hidePage('beallitasok')
 	}
-	currentPage = page
 	document.getElementById(page).style.display = 'block'
 	loadUserDatas().then(function (result) {
 		document.getElementById('username').innerHTML = result['Name']
@@ -452,7 +452,7 @@ function realRenderFooldal() {
 				}
 				strázsa++
 			}
-			isFirstNote = true
+			var isFirstNote = true
 			result['Notes'].forEach(function (element) {
 				document.getElementById('fooldalNotes').innerHTML += `
                 <li>
@@ -693,8 +693,7 @@ function renderGrades() {
 				}
 			}
 
-			gradesTabs = M.Tabs.init(document.querySelectorAll('.tabs'), {})
-
+			var gradesTabs = M.Tabs.init(document.querySelectorAll('.tabs'), {})
 			M.Collapsible.init(document.querySelectorAll('.collapsible'), {})
 			isJegyeimLoadedOnce = true
 		})
@@ -997,10 +996,11 @@ function renderTimetable(positionInTime) {
 			today.setDate(today.getDate() + (7 * positionInTime))
 
 			// Open automatically today's timetable
-			document.getElementById(`orarend-${today.getDay()}`).classList.add("active")
-
+			try {
+				document.getElementById(`orarend-${today.getDay()}`).classList.add("active")
+			} catch {}
 			console.log(`orarend-${today.getDay()}`)
-			
+
 			var startDay = getMonday(today)
 			var endDay = new Date(startDay.addDays(4))
 			document.getElementById('timetableDate').innerHTML = `${startDay.getFullYear()}. ${startDay.getMonth() + 1}. ${startDay.getDate()}. - ${endDay.getFullYear()}. ${endDay.getMonth() + 1}. ${endDay.getDate()}.`

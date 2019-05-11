@@ -47,7 +47,7 @@ function showMessage(message, hide = true, replaceAll = false) {
 
 function showMessage (message, hide = true, replaceAll = false) {
   M.toast({
-    html: msg,
+    html: message,
     displayLength: 2147483647
   })
 }
