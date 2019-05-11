@@ -545,8 +545,6 @@ function renderFooldal() {
 					})
 
 					let current_datetime = new Date()
-					current_datetime.setDate(current_datetime.getDate() - 2)
-					console.log(current_datetime)
 					let formatted_date = current_datetime.getFullYear() + "-" + (current_datetime.getMonth() + 1) + "-" + current_datetime.getDate()
 					var van = false;
 					kreta
