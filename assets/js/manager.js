@@ -8,9 +8,10 @@ const {ipcRenderer} = require('electron')
 
 const loggerUICore = LoggerUtil('%c[UICore]', 'color: #000668; font-weight: bold')
 const loggerAutoUpdater = LoggerUtil('%c[AutoUpdater]', 'color: #000668; font-weight: bold')
+const loggerNotification = LoggerUtil('%c[Értesítések]', 'color: #ffaaff; font-weight: bold')
 const loggerAutoUpdaterSuccess = LoggerUtil('%c[AutoUpdater]', 'color: #209b07; font-weight: bold')
-require('../renderer.js')
 
+require('../renderer.js')
 
 const isDev = require('./js/isdev')
 
@@ -1430,10 +1431,7 @@ document.querySelector('#login').addEventListener('submit', function (e) {
 						data.push(user)
 						file.saveGlobal('users', data).then(function () {
 							// console.log(result)
-							saveLoginDatas(result, id, instituteCode).then(function (
-								result,
-								err
-							) {
+							saveLoginDatas(result, id, instituteCode).then(function (result,err) {
 								// Show the main page
 								showPage('fooldal')
 								// Hide logging in
@@ -1480,7 +1478,7 @@ function notificationListener() {
 				file.get(currentUser, 'viewedGrades', []).then(function (result2) {
 					if (result2.length > 0) {
 						// console.log(result2.length)
-
+						loggerNotification.log('Újonnan érkezett jegyek ellenőrzése...')
 						result['Evaluations'].forEach(function (element) {
 							file.get(currentUser, 'viewedGrades').then(function (result3) {
 								var viewed = false
@@ -1493,7 +1491,7 @@ function notificationListener() {
 									let myNotification = new Notification(element['Subject'], {
 										body: element['Value']
 									})
-
+									loggerNotification.log(`Új értékelés: ${element['Value']}`)
 									var jegy = {
 										id: element['EvaluationId'],
 										subject: element['Subject'],
@@ -1505,6 +1503,7 @@ function notificationListener() {
 							})
 						})
 					} else {
+						loggerNotification.log('Még nem kaptál értesítést a jegyeidről. A mostantól kapott jegyeidről már fogsz!')
 						var grades = []
 						result['Evaluations'].forEach(function (element) {
 							var jegy = {

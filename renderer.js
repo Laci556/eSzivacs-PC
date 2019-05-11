@@ -29,11 +29,11 @@ function showMessage (message, hide = true, replaceAll = false) {
 }
 
 function showModal () {
-	document.getElementsByClassName("sidenav")[0].innerHTML = document.getElementsByClassName("sidenav")[0].innerHTML + `
+	document.getElementsByClassName('sidenav')[0].innerHTML = `${document.getElementsByClassName('sidenav')[0].innerHTML}
 	<li class="quitAndInstall green-text"><a href="#!"><i class="material-icons">done</i>Frissítés letöltve. Újraindítás!</a></li>
 	<li class="divider"></li>`;
 
-	document.getElementById("user").innerHTML = document.getElementById("user").innerHTML + `<li class="quitAndInstall"><a href="#!">Frissítés letöltve. Újraindítás!</a></li>
+	document.getElementById('user').innerHTML = `${document.getElementById('user').innerHTML}<li class="quitAndInstall"><a href="#!">Frissítés letöltve. Újraindítás!</a></li>
 	`
 	document.querySelector('body').innerHTML += `<div id="updateAvailable" class="modal">
 	<div class="modal-content center-align">
@@ -45,7 +45,7 @@ function showModal () {
 	</div>
 </div>`
 	var restartButtons = document.getElementsByClassName('quitAndInstall');
-	for(var i = 0; i < restartButtons.length; i++){
+	for (var i = 0; i < restartButtons.length; i++) {
 		restartButtons[i].addEventListener('click', quitAndInstall)
 	}
 	var elem = document.getElementById('updateAvailable')
@@ -54,9 +54,9 @@ function showModal () {
 }
 
 function pushToFooldal () {
-	document.getElementById("fooldal").innerHTML += `<div class="col s12 m4"><div class="card"><div class="card-content"><h4>🎉 Új frissítés érhető el</h4></div><div class="card-action"><a href="#" class="quitAndInstall black-text">Újraindítás és telepítés</a></div></div></div>`
+	document.getElementById('fooldal').innerHTML += '<div class="col s12 m4"><div class="card"><div class="card-content"><h4>🎉 Új frissítés érhető el</h4></div><div class="card-action"><a href="#" class="quitAndInstall black-text">Újraindítás és telepítés</a></div></div></div>'
 	var restartButtons = document.getElementsByClassName('quitAndInstall');
-	for(var i = 0; i < restartButtons.length; i++){
+	for (var i = 0; i < restartButtons.length; i++) {
 		restartButtons[i].addEventListener('click', quitAndInstall)
 	}
 	var elem = document.getElementById('updateAvailable')
