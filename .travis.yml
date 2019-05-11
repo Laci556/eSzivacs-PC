@@ -11,14 +11,6 @@ matrix:
     - os: linux
       services: docker
       language: generic
-    - os: windows
-      language: node_js
-      node_js:
-      - "node"
-      - "10"
-      - "8"
-      - "6"
-      - "5"
 
 cache:
   directories:
@@ -27,7 +19,6 @@ cache:
     - $HOME/.cache/electron-builder
 
 install:
-  - nvs use node/12.2.0/x64
   - npm install
 
 script:
