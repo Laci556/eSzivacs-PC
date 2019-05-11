@@ -10,8 +10,8 @@ function showNavbar(toShow) {
   var showNavBar;
 
   if (toShow) {
-    titleBarColor =
-      '-webkit-linear-gradient(top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)';
+    titleBarColor = '#000';
+      //'-webkit-linear-gradient(top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)';
     showTitleBarLogo = 'none';
     showNavBar = 'block';
     var logoutButtons = document.getElementsByClassName('logout');
@@ -69,8 +69,8 @@ function showNavbar(toShow) {
       })(i);
     }
   } else {
-    titleBarColor =
-      '-webkit-linear-gradient(top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)';
+    titleBarColor = '#000';
+      //'-webkit-linear-gradient(top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)';
     showTitleBarLogo = 'block';
     showNavBar = 'none';
   }
