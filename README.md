@@ -14,9 +14,9 @@
 
 | Platform (verzió) | Fájl neve |
 | -------- | --------------- |
-| Windows x64 (v1.5.0) | [`eSzivacs.exe`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.5.0/eSzivacs.exe) |
-| macOS (v1.5.0) | [`eSzivacs.dmg`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.5.0/eSzivacs.dmg) |
-| Linux (v1.5.0) | [`eSzivacs.AppImage`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.5.0/eSzivacs.AppImage) |
+| Windows x64 (v1.5.1) | [`eSzivacs.exe`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.5.1/eSzivacs.exe) |
+| macOS (v1.5.1) | [`eSzivacs.dmg`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.5.1/eSzivacs.dmg) |
+| Linux (v1.5.1) | [`eSzivacs.AppImage`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.5.1/eSzivacs.AppImage) |
 
 ## Jellemzők
 - :electron: Electron alapú felület
@@ -64,6 +64,7 @@
 
 ## Közreműködők
 Külön köszönet [boapps](https://github.com/boapps/)-nak, aki létrehozta a [e-kreta-hidden-api-docs](https://github.com/boapps/e-kreta-api-docs)-t!
+A MacOS-es változat nem jöhetett volna létre [Laci556](https://github.com/Laci556) nélkül, akinek köszönöm a munkáját!
 ## Licensz
 ```
 BSD 2-Clause License
