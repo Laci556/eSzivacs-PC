@@ -1,100 +1,107 @@
-.page{
-    display: none;
+.page {
+  display: none;
 }
 
-.tabs{
-    background-color: black !important;
+.tabs {
+  background-color: black !important;
+}
+
+a {
+  -webkit-user-drag: none;
 }
 
 .tabs .tab a,
-.tabs .tab a:hover{
-    color: white !important;
+.tabs .tab a:hover {
+  color: white !important;
 }
 
-.tabs .tab a:focus, .tabs .tab a:focus.active{
-    background-color: transparent;
+.tabs .tab a:focus,
+.tabs .tab a:focus.active {
+  background-color: transparent;
 }
 .tabs .indicator {
-    background-color: white !important;
+  background-color: white !important;
 }
 
 .secondary-content {
-    float: right;
-    color: black !important;
-    font-weight: bold;
-    cursor: default;
+  float: right;
+  color: black !important;
+  font-weight: bold;
+  cursor: default;
 }
 
-.collection{
-    background-color: white !important;
+.collection {
+  background-color: white !important;
 }
 
 #jegyek .card {
-    color: black !important;
+  color: black !important;
 }
 
 .collapsible,
-.active{
-    border: 0px !important;
+.active {
+  border: 0px !important;
 }
 
-.collapsible-body{
-    background-color: #eeeeee;
+.collapsible-body {
+  background-color: #eeeeee;
 }
 
-.collection-item{
-    color: black !important;
+.collection-item {
+  color: black !important;
 }
 
-.tabs .tab a:focus, .tabs .tab a:focus.active {
-    background-color: rgba(0, 0, 0, 0) !important;
+.tabs .tab a:focus,
+.tabs .tab a:focus.active {
+  background-color: rgba(0, 0, 0, 0) !important;
 }
 
-#timetableTop .material-icons{
-    color: white !important;
+#timetableTop .material-icons {
+  color: white !important;
 }
 
 .collection.with-header .collection-header {
-    border-bottom: rgba(0, 0, 0, 0) !important;
+  border-bottom: rgba(0, 0, 0, 0) !important;
 }
 
-.collapsible{
-    box-shadow: none !important;
-    margin: .5rem 0 0 0 !important;
+.collapsible {
+  box-shadow: none !important;
+  margin: 0.5rem 0 0 0 !important;
 }
 
-#fooldalNotes .collapsible-header{
-    padding-left: 30px !important;
+#fooldalNotes .collapsible-header {
+  padding-left: 30px !important;
 }
 
-.timetableTab{
-    margin-bottom: 20px;
+.timetableTab {
+  margin-bottom: 20px;
 }
 
 input {
-    border-bottom-color: rgba(0,0,0,0.87) !important;
-    -webkit-box-shadow: none !important;
-    box-shadow: none !important;
+  border-bottom-color: rgba(0, 0, 0, 0.87) !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
 }
 
 .input-field label {
-    color: rgba(0,0,0,0.87) !important;
+  color: rgba(0, 0, 0, 0.87) !important;
 }
 
-.dropdown-content li>span {
-    color: rgba(0,0,0,0.87) !important;
+.dropdown-content li > span {
+  color: rgba(0, 0, 0, 0.87) !important;
 }
-.dropdown-content li>a, .dropdown-content li>span {
-    color:  rgba(0,0,0,0.87) !important;
+.dropdown-content li > a,
+.dropdown-content li > span {
+  color: rgba(0, 0, 0, 0.87) !important;
 }
 
-#jegyek .row{
-    margin-right: 0 !important;
+#jegyek .row {
+  margin-right: 0 !important;
 }
 
 .row .col.s-one-fifth {
-    width: 20%;
-    margin-left: auto;
-    left: auto;
-    right: auto;
+  width: 20%;
+  margin-left: auto;
+  left: auto;
+  right: auto;
 }

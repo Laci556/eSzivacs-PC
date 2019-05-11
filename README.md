@@ -15,6 +15,7 @@
 | Platform (verzió) | Fájl neve |
 | -------- | --------------- |
 | Windows x64 (v1.4.1) | [`eSzivacs.exe`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.4.1/eSzivacs.exe) |
+| macOS (v1.4.1) | [`eSzivacs.dmg`](https://github.com/pepyta/eSzivacs-PC/releases/download/v1.4.1/eSzivacs.dmg) |
 
 ## Jellemzők
 - :electron: Electron alapú felület
@@ -47,6 +48,8 @@
 | Windows x64 | `npm run dist:win`   |
 | macOS       | `npm run dist:mac`   |
 | Linux x64   | `npm run dist:linux` |
+
+*macOS platformon hibaüzenetet fog dobni a program indításkor, ha nem írod alá (codesigning) a fájlt, erről részletesebben [itt](https://github.com/electron/electron/issues/7476) olvashatsz.*
 
 ## Harmadik féltől származó szoftverek licenszei
 - [boapps/e-kreta-hidden-api-docs](https://raw.githubusercontent.com/boapps/e-kreta-api-docs/master/LICENSE)
